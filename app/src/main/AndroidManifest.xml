@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.mord.myapplication">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:ignore="AllowBackup">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <provider
+            android:name=".DBProvider"
+            android:authorities="com.example.mord.myapplication.dbprovider"
+            android:exported="false" />
+
+        <activity android:name=".TermDetail" />
+        <activity android:name=".TermList" />
+        <activity android:name=".CourseList" />
+        <activity android:name=".CourseDetail" />
+        <activity android:name=".AssessmentList" />
+        <activity android:name=".AssessmentDetail" />
+        <activity
+            android:name=".EditorActivity"
+            android:label="@string/title_activity_editor"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".TermEditor"
+            android:label="@string/title_activity_term_editor"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.mord.myapplication.MainActivity" />
+        </activity>
+        <activity
+            android:name=".CourseEditor"
+            android:label="@string/title_activity_course_editor"
+            android:parentActivityName=".TermEditor"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.mord.myapplication.TermEditor" />
+        </activity>
+    </application>
+
+</manifest>
