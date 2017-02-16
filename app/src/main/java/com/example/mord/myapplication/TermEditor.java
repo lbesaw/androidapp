@@ -48,8 +48,8 @@ public class TermEditor extends AppCompatActivity {
                     // when dialog box is closed, below method will be called.
                     public void onDateSet(DatePicker view, int selectedYear,
                                           int selectedMonth, int selectedDay) {
-                        startDateEditText.setText("" + selectedMonth + 1 + "/" + selectedDay + "/" + selectedYear);
-                        thisTerm.setStartDate(selectedDay, selectedMonth, selectedYear);
+                        startDateEditText.setText(selectedMonth + 1 + "/" + selectedDay + "/" + selectedYear);
+                        thisTerm.setStartDate(selectedDay, selectedMonth+1, selectedYear);
                     }
                 };
                 Calendar cal = Calendar.getInstance(TimeZone.getDefault()); // Get current date
@@ -76,8 +76,8 @@ public class TermEditor extends AppCompatActivity {
                     // when dialog box is closed, below method will be called.
                     public void onDateSet(DatePicker view, int selectedYear,
                                           int selectedMonth, int selectedDay) {
-                        endDateEditText.setText("" + selectedMonth + 1 + "/" + selectedDay + "/" + selectedYear);
-                        thisTerm.setEndDate(selectedDay, selectedMonth, selectedYear);
+                        endDateEditText.setText(selectedMonth + 1 + "/" + selectedDay + "/" + selectedYear);
+                        thisTerm.setEndDate(selectedDay, selectedMonth+1, selectedYear);
                     }
                 };
                 Calendar cal = Calendar.getInstance(TimeZone.getDefault()); // Get current date

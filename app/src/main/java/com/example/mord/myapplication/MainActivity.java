@@ -20,18 +20,20 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int EDITOR_REQUEST_CODE = 1001;
     private DBProvider datasource;
-    //private ArrayAdapter<Term> termListAdapter;
+    private ArrayAdapter<Term> termListAdapter;
     private List<Term> termList;
     private ListView list;
-    private TermsCursorAdapter termListAdapter;
+//    private TermsCursorAdapter termListAdapter;
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -118,8 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void displayTerms() {
         termList = datasource.getTerms();
-        termListAdapter = new TermsCursorAdapter(this, null, 0);
-        //termListAdapter = new ArrayAdapter<Term>(this, R.layout.note_list_item, R.id.tvNote, termList);
+        termListAdapter = new ArrayAdapter<>(this, R.layout.note_list_item, R.id.tvNote, termList);
         list.setAdapter(termListAdapter);
     }
 

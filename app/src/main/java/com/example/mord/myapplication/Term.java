@@ -98,4 +98,7 @@ public class Term {
         termCourses.add(course);
     }
 
+    public String toString() {
+        return termTitle;
+    }
 }
