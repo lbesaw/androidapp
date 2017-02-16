@@ -18,10 +18,10 @@
             </intent-filter>
         </activity>
 
-        <provider
-            android:name=".DBProvider"
-            android:authorities="com.example.mord.myapplication.dbprovider"
-            android:exported="false" />
+        <!--<provider-->
+            <!--android:name=".DBProvider"-->
+            <!--android:authorities="com.example.mord.myapplication.dbprovider"-->
+            <!--android:exported="false" />-->
 
         <activity android:name=".TermDetail" />
         <activity android:name=".TermList" />
@@ -29,11 +29,6 @@
         <activity android:name=".CourseDetail" />
         <activity android:name=".AssessmentList" />
         <activity android:name=".AssessmentDetail" />
-        <activity
-            android:name=".EditorActivity"
-            android:label="@string/title_activity_editor"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".TermEditor"
             android:label="@string/title_activity_term_editor"

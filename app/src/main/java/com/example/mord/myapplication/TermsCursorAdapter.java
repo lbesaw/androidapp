@@ -9,8 +9,8 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 
-public class NotesCursorAdapter extends CursorAdapter {
-    public NotesCursorAdapter(Context context, Cursor c, int flags) {
+public class TermsCursorAdapter extends CursorAdapter {
+    public TermsCursorAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
 
@@ -26,10 +26,6 @@ public class NotesCursorAdapter extends CursorAdapter {
         String noteText = cursor.getString(
                 cursor.getColumnIndex(DBOpenHelper.TERM_TITLE));
 
-        int pos = noteText.indexOf(10);
-        if(pos != -1) {
-            noteText = noteText.substring(0, pos) + "...";
-        }
         TextView tv = (TextView) view.findViewById(R.id.tvNote);
         tv.setText(noteText);
     }

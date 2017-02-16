@@ -15,6 +15,8 @@ import android.widget.Toast;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import javax.sql.DataSource;
+
 public class TermEditor extends AppCompatActivity {
     int startDay, startMonth, startYear, endDay, endMonth, endYear;
     String termTitle;
@@ -122,18 +124,14 @@ public class TermEditor extends AppCompatActivity {
 //    }
 
     private void insertNote(String termTitle, int startDay, int startMonth, int startYear, int endDay, int endMonth, int endYear) {
-
+        DBProvider datasource = new DBProvider(this);
         thisTerm.setTermTitle(termTitle);
+        thisTerm.setStartDate(startDay, startMonth, startYear);
+        thisTerm.setEndDate(endDay, endMonth, endYear);
         TermHandler.addTerm(thisTerm);
-        ContentValues values = new ContentValues();
-        values.put(DBOpenHelper.TERM_TITLE, termTitle);
-        values.put(DBOpenHelper.TERM_START_DAY, startDay);
-        values.put(DBOpenHelper.TERM_START_MONTH, startMonth);
-        values.put(DBOpenHelper.TERM_START_YEAR, startYear);
-        values.put(DBOpenHelper.TERM_END_DAY, endDay);
-        values.put(DBOpenHelper.TERM_END_MONTH, endMonth);
-        values.put(DBOpenHelper.TERM_END_YEAR, endYear);
-        getContentResolver().insert(DBProvider.TERM_CONTENT_URI, values);
+        datasource.open();
+        datasource.add(thisTerm);
+        datasource.close();
         setResult(RESULT_OK);
         Toast.makeText(this, "RESULTS POSTED", Toast.LENGTH_LONG).show();
     }

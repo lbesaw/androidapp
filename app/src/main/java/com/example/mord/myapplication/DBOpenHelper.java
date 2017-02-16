@@ -56,8 +56,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public static final String ASSESSMENT_DUE_MONTH = "startMonth";
     public static final String ASSESSMENT_DUE_YEAR = "startYear";
 
-    public static final String[] ASSESSMENTS_ALL_COLUMNS = {ASSESSMENT_ID, ASSESSMENT_COURSE, ASSESSMENT_TYPE, ASSESSMENT_TEXT_NOTES, ASSESSMENT_PIC_NOTES, ASSESSMENT_DUE_DAY,
-            ASSESSMENT_DUE_MONTH, ASSESSMENT_DUE_YEAR};
+
 
     //SQL for creating assessments table
     public static final String ASSESSMENTS_TABLE_CREATE =
@@ -74,9 +73,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
                     TABLE_COURSES+"("+COURSE_TITLE+") "+
                     ")";
 
-    public static final String[] COURSES_ALL_COLUMNS = {COURSE_ID, COURSE_TERM, COURSE_TITLE, COURSE_STATUS,
-            COURSE_TEXT_NOTES, COURSE_PICTURE_NOTES, COURSE_START_DAY, COURSE_START_MONTH, COURSE_START_YEAR, COURSE_END_DAY,
-            COURSE_END_MONTH, COURSE_END_YEAR, COURSE_MENTOR};
+
     //SQL for creating courses table
     private static final String COURSES_TABLE_CREATE =
             "CREATE TABLE " + TABLE_COURSES + " (" +
@@ -92,22 +89,20 @@ public class DBOpenHelper extends SQLiteOpenHelper {
                     COURSE_END_DAY + " INTEGER, " +
                     COURSE_END_MONTH + " INTEGER, " +
                     COURSE_END_YEAR + " INTEGER, "+
-                    COURSE_MENTOR + " STRING, " +
+                    COURSE_MENTOR + " TEXT, " +
                     "FOREIGN KEY ("+COURSE_MENTOR+") REFERENCES "+
                     TABLE_MENTORS+"("+MENTOR_NAME+") "+
                     "FOREIGN KEY ("+COURSE_TERM+") REFERENCES "+
                     TABLE_TERMS+"("+TERM_TITLE+") "+
                     ")";
 
-    public static final String[] MENTORS_ALL_COLUMNS = {MENTOR_NAME, MENTOR_PHONE, MENTOR_EMAIL};
     public static final String MENTORS_TABLE_CREATE =
             "CREATE TABLE "+TABLE_MENTORS+" ("+
                     MENTOR_NAME + " TEXT PRIMARY KEY, " +
                     MENTOR_PHONE + " TEXT, " +
-                    MENTOR_EMAIL + " TEXT, " +
+                    MENTOR_EMAIL + " TEXT " +
                     ")";
 
-   public static final String[] TERMS_ALL_COLUMNS = {TERM_ID, TERM_TITLE, TERM_START_DAY, TERM_START_MONTH, TERM_START_YEAR, TERM_END_DAY, TERM_END_MONTH, TERM_END_YEAR};
 
     //SQL to create term table
     private static final String TERMS_TABLE_CREATE =

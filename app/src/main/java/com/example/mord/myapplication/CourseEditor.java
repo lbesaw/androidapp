@@ -11,19 +11,22 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class CourseEditor extends AppCompatActivity implements android.app.LoaderManager.LoaderCallbacks<Cursor> {
+import java.util.ArrayList;
+import java.util.List;
+
+public class CourseEditor extends AppCompatActivity {
 private Term thisTerm;
     private Course thisCourse = new Course();
-    private CursorAdapter cursorAdapter;
-
-    private void restartLoader() {
-        getLoaderManager().restartLoader(0, null, this);
-    }
+    private ArrayAdapter<Course> courseListAdapter;
+    private List<Course> courseList;
+    private DBProvider datasource;
+    private ListView list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,16 +34,14 @@ private Term thisTerm;
         setContentView(R.layout.activity_course_editor);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        cursorAdapter = new CoursesCursorAdapter(this, null, 0);
-        ListView list = (ListView) findViewById(R.id.courseList);
-        list.setAdapter(cursorAdapter);
-
-        getLoaderManager().initLoader(0, null, this);
+        list = (ListView) findViewById(R.id.courseList);
+        datasource = new DBProvider(this);
+        datasource.open();
 
 
         Bundle bundle = getIntent().getExtras();
         final String termTitle = (String) bundle.get("termTitle");
-        thisTerm = TermHandler.getTerm(termTitle);
+        thisTerm = datasource.getTerm(termTitle);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,6 +52,7 @@ private Term thisTerm;
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        loadCourses();
     }
     public void addTerm(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -83,19 +85,10 @@ private Term thisTerm;
         builder.show();
 
     }
-    @Override
-    public android.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new android.content.CursorLoader(this, DBProvider.TERM_CONTENT_URI, null, null, null, null);
-    }
-
-    @Override
-    public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor data) {
-        cursorAdapter.swapCursor(data);
-    }
-
-    @Override
-    public void onLoaderReset(android.content.Loader<Cursor> loader) {
-        cursorAdapter.swapCursor(null);
+    private void loadCourses() {
+        courseList = datasource.getCourses(thisTerm);
+        courseListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, android.R.id.text1, courseList);
+        list.setAdapter(courseListAdapter);
     }
     @Override
     public void onBackPressed() {
