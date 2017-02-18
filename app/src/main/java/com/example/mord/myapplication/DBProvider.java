@@ -12,9 +12,8 @@ import java.util.List;
 
 public class DBProvider {
 
-    private static final int TERM = 1;
-    private static final int TERM_ID = 2;
-    public static final String CONTENT_ITEM_TYPE = "Note";
+
+    public static final String CONTENT_ITEM_TYPE = "editor";
     public SQLiteDatabase database;
     private SQLiteOpenHelper dbhelper;
 
@@ -48,6 +47,18 @@ public class DBProvider {
         values.put(DBOpenHelper.TERM_END_MONTH, term.getEndMonth());
         values.put(DBOpenHelper.TERM_END_YEAR, term.getEndYear());
         database.insert(DBOpenHelper.TABLE_TERMS, null, values);
+    }
+
+    public void update(String oldTerm, Term term) {
+        ContentValues values = new ContentValues();
+        values.put(DBOpenHelper.TERM_TITLE, term.getTermTitle());
+        values.put(DBOpenHelper.TERM_START_DAY, term.getStartDay());
+        values.put(DBOpenHelper.TERM_START_MONTH, term.getStartMonth());
+        values.put(DBOpenHelper.TERM_START_YEAR, term.getStartYear());
+        values.put(DBOpenHelper.TERM_END_DAY, term.getEndDay());
+        values.put(DBOpenHelper.TERM_END_MONTH, term.getEndMonth());
+        values.put(DBOpenHelper.TERM_END_YEAR, term.getEndYear());
+        database.update(DBOpenHelper.TABLE_TERMS, values, DBOpenHelper.TERM_TITLE +"=\""+oldTerm+"\"", null);
     }
 
     public Term getTerm(String termName) {

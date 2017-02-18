@@ -28,7 +28,7 @@ import java.util.function.Consumer;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int EDITOR_REQUEST_CODE = 1001;
+    private static final int EDITOR_REQUEST_CODE = 666;
     private DBProvider datasource;
     private ArrayAdapter<Term> termListAdapter;
     private List<Term> termList;
@@ -99,9 +99,13 @@ public class MainActivity extends AppCompatActivity {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-//                intent.putExtra(DBProvider.CONTENT_ITEM_TYPE, -1);
-//                startActivityForResult(intent, EDITOR_REQUEST_CODE);
+                Intent intent = new Intent(MainActivity.this, TermEditor.class);
+                Term term = (Term) parent.getAdapter().getItem(position);
+                Bundle bundle = new Bundle();
+                bundle.putString("termTitle", term.getTermTitle());
+                intent.putExtras(bundle);
+//                intent.putExtra(DBProvider.CONTENT_ITEM_TYPE, term.getTermTitle());
+                startActivityForResult(intent, EDITOR_REQUEST_CODE);
             }
         });
 
@@ -111,10 +115,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, TermEditor.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("termTitle", null);
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
-
 
     }
 

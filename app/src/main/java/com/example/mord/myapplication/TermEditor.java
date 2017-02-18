@@ -1,7 +1,6 @@
 package com.example.mord.myapplication;
 
 import android.app.DatePickerDialog;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,13 +14,16 @@ import android.widget.Toast;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import javax.sql.DataSource;
 
 public class TermEditor extends AppCompatActivity {
+
+    private String action;
+
     int startDay, startMonth, startYear, endDay, endMonth, endYear;
     String termTitle;
     Term thisTerm = new Term();
-
+    String id;
+    String term;
     public void setTermTitle(String termTitle) {
         this.termTitle = termTitle;
     }
@@ -38,6 +40,25 @@ public class TermEditor extends AppCompatActivity {
 
         final EditText startDateEditText = (EditText) findViewById(R.id.startDateEditText);
         final EditText endDateEditText = (EditText) findViewById(R.id.endDateEditText);
+        final EditText termInputName = (EditText) findViewById(R.id.termInputName);
+
+
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        final String id = (String) bundle.get("termTitle");
+
+        if(id == null) {
+            action = Intent.ACTION_INSERT;
+             }
+        else {
+            DBProvider provider = new DBProvider(this);
+            provider.open();
+            action = Intent.ACTION_EDIT;
+            thisTerm = provider.getTerm(id);
+            termInputName.setText(thisTerm.getTermTitle());
+            startDateEditText.setText(thisTerm.getStartMonth()+1+ "/"+thisTerm.getStartDay()+"/"+thisTerm.getStartYear());
+            endDateEditText.setText(thisTerm.getEndMonth()+1+ "/"+thisTerm.getEndDay()+"/"+thisTerm.getEndYear());
+        }
 
         startDateEditText.setOnClickListener(new View.OnClickListener() {
 
@@ -106,24 +127,33 @@ public class TermEditor extends AppCompatActivity {
 
     private void finishedEditing() {
         final EditText termInputName = (EditText) findViewById(R.id.termInputName);
-//        switch(action) {
-//            case Intent.ACTION_INSERT:
-        insertNote(termInputName.getText().toString(), startDay, startMonth, startYear, endDay, endMonth, endYear);
-//                break;
-//        }
-//        finish();
+        switch(action) {
+            case Intent.ACTION_INSERT:
+        insertTerm(termInputName.getText().toString(), startDay, startMonth, startYear, endDay, endMonth, endYear);
+                break;
+            case Intent.ACTION_EDIT:
+                DBProvider provider = new DBProvider(this);
+                provider.open();
+                term=thisTerm.getTermTitle();
+                thisTerm.setTermTitle(termInputName.getText().toString());
+                provider.update(term, thisTerm);
+                setResult(RESULT_OK);
+                provider.close();
+                break;
+        }
+        finish();
     }
 
-    /// TO IMPLEMENT UPDATE TERM
-//    private void updateNote(String noteText) {
-//        ContentValues values = new ContentValues();
-//        values.put(DBOpenHelper.TERM_TITLE, noteText);
-//        getContentResolver().update(DBProvider.TERM_CONTENT_URI, values, noteFilter, null);
-//        Toast.makeText(this, "Note Updated", Toast.LENGTH_SHORT).show();
-//        setResult(RESULT_OK);
-//    }
+   // TO IMPLEMENT UPDATE TERM
+  //  private void updateNote(String noteText) {
+   //     ContentValues values = new ContentValues();
+      //  values.put(DBOpenHelper.TERM_TITLE, noteText);
+     //   getContentResolver().update(DBProvider.TERM_CONTENT_URI, values, noteFilter, null);
+     //   Toast.makeText(this, "Note Updated", Toast.LENGTH_SHORT).show();
+     //   setResult(RESULT_OK);
+  //  }
 
-    private void insertNote(String termTitle, int startDay, int startMonth, int startYear, int endDay, int endMonth, int endYear) {
+    private void insertTerm(String termTitle, int startDay, int startMonth, int startYear, int endDay, int endMonth, int endYear) {
         DBProvider datasource = new DBProvider(this);
         thisTerm.setTermTitle(termTitle);
         thisTerm.setStartDate(startDay, startMonth, startYear);
