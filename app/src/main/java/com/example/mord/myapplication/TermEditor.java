@@ -6,23 +6,27 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 
 
 public class TermEditor extends AppCompatActivity {
 
     private String action;
-
-    int startDay, startMonth, startYear, endDay, endMonth, endYear;
+    private ListView list;
+    private ArrayAdapter<Course> courseListAdapter;
+    private List<Course> courseList;
     String termTitle;
     Term thisTerm = new Term();
-    String id;
     String term;
     public void setTermTitle(String termTitle) {
         this.termTitle = termTitle;
@@ -38,10 +42,10 @@ public class TermEditor extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        final EditText startDateEditText = (EditText) findViewById(R.id.startDateEditText);
-        final EditText endDateEditText = (EditText) findViewById(R.id.endDateEditText);
+        final TextView startDateEditText = (TextView) findViewById(R.id.startDateEditText);
+        final TextView endDateEditText = (TextView) findViewById(R.id.endDateEditText);
         final EditText termInputName = (EditText) findViewById(R.id.termInputName);
-
+        list = (ListView) findViewById(R.id.courseList);
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
@@ -82,7 +86,7 @@ public class TermEditor extends AppCompatActivity {
                         cal.get(Calendar.MONTH),
                         cal.get(Calendar.DAY_OF_MONTH));
                 datePicker.setCancelable(false);
-                datePicker.setTitle("Select the date");
+                datePicker.setTitle("Select term start date");
                 datePicker.show();
 
             }
@@ -110,7 +114,7 @@ public class TermEditor extends AppCompatActivity {
                         cal.get(Calendar.MONTH),
                         cal.get(Calendar.DAY_OF_MONTH));
                 datePicker.setCancelable(false);
-                datePicker.setTitle("Select the date");
+                datePicker.setTitle("Select term ending date");
                 datePicker.show();
 
             }
@@ -122,14 +126,14 @@ public class TermEditor extends AppCompatActivity {
                 finishedEditing();
             }
         });
-
+        displayCourses();
     }
 
     private void finishedEditing() {
         final EditText termInputName = (EditText) findViewById(R.id.termInputName);
         switch(action) {
             case Intent.ACTION_INSERT:
-        insertTerm(termInputName.getText().toString(), startDay, startMonth, startYear, endDay, endMonth, endYear);
+        insertTerm(termInputName.getText().toString());
                 break;
             case Intent.ACTION_EDIT:
                 DBProvider provider = new DBProvider(this);
@@ -144,24 +148,14 @@ public class TermEditor extends AppCompatActivity {
         finish();
     }
 
-   // TO IMPLEMENT UPDATE TERM
-  //  private void updateNote(String noteText) {
-   //     ContentValues values = new ContentValues();
-      //  values.put(DBOpenHelper.TERM_TITLE, noteText);
-     //   getContentResolver().update(DBProvider.TERM_CONTENT_URI, values, noteFilter, null);
-     //   Toast.makeText(this, "Note Updated", Toast.LENGTH_SHORT).show();
-     //   setResult(RESULT_OK);
-  //  }
 
-    private void insertTerm(String termTitle, int startDay, int startMonth, int startYear, int endDay, int endMonth, int endYear) {
-        DBProvider datasource = new DBProvider(this);
+    private void insertTerm(String termTitle) {
+        DBProvider provider = new DBProvider(this);
         thisTerm.setTermTitle(termTitle);
-        thisTerm.setStartDate(startDay, startMonth, startYear);
-        thisTerm.setEndDate(endDay, endMonth, endYear);
         TermHandler.addTerm(thisTerm);
-        datasource.open();
-        datasource.add(thisTerm);
-        datasource.close();
+        provider.open();
+        provider.add(thisTerm);
+        provider.close();
         setResult(RESULT_OK);
         Toast.makeText(this, "RESULTS POSTED", Toast.LENGTH_LONG).show();
     }
@@ -190,5 +184,13 @@ public class TermEditor extends AppCompatActivity {
         finishedEditing();
     }
 
+    private void displayCourses() {
+        DBProvider provider = new DBProvider(this);
+        provider.open();
+        courseList = provider.getCourses(thisTerm);
+        courseListAdapter = new ArrayAdapter<>(this, R.layout.note_list_item, R.id.tvNote, courseList);
+        list.setAdapter(courseListAdapter);
+        provider.close();
+    }
 
 }

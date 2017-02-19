@@ -100,7 +100,7 @@ public class DBProvider {
     }
     public List<Course> getCourses(Term term) {
         List<Course> courses = new ArrayList<>();
-        Cursor cursor = database.query(DBOpenHelper.TABLE_COURSES, COURSES_ALL_COLUMNS, DBOpenHelper.COURSE_TERM + " = ?", new String[] {String.valueOf(term.getTermTitle())}, null, null, null);
+        Cursor cursor = database.query(DBOpenHelper.TABLE_COURSES, COURSES_ALL_COLUMNS, null /*DBOpenHelper.COURSE_TERM + " = \""+term.getTermTitle()+"\""*/, null, null, null, null);
         if(cursor.getCount() > 0) {
             while(cursor.moveToNext()) {
                 Course course = new Course();
