@@ -1,61 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
 
     <TextView
-        android:text="Course Name:"
-        android:layout_width="290dp"
+        android:text="Mentor name:"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textView6" />
+        android:layout_marginLeft="23dp"
+        android:layout_marginStart="23dp"
+        android:layout_marginTop="34dp"
+        android:id="@+id/textView8"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <EditText
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
-        android:text="Name"
         android:ems="10"
-        android:id="@+id/courseEditorCourseName" />
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/textView8"
+        android:layout_toEndOf="@+id/textView8"
+        android:layout_marginLeft="18dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="19dp"
+        android:id="@+id/etMentorName" />
 
     <TextView
-        android:text="Start Date:"
-        android:layout_width="match_parent"
+        android:text="Mentor e-mail:"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textView7" />
+        android:layout_marginTop="33dp"
+        android:id="@+id/textView10"
+        android:layout_below="@+id/etMentorName"
+        android:layout_alignLeft="@+id/textView8"
+        android:layout_alignStart="@+id/textView8" />
 
     <EditText
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="date"
+        android:inputType="textEmailAddress"
         android:ems="10"
-        android:id="@+id/editText3" />
+        android:id="@+id/etMentorEmail"
+        android:layout_alignBaseline="@+id/textView10"
+        android:layout_alignBottom="@+id/textView10"
+        android:layout_alignLeft="@+id/etMentorName"
+        android:layout_alignStart="@+id/etMentorName" />
 
     <TextView
-        android:text="End Date:"
-        android:layout_width="match_parent"
+        android:text="Mentor phone:"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textView8" />
+        android:layout_marginTop="35dp"
+        android:id="@+id/textView12"
+        android:layout_below="@+id/etMentorEmail"
+        android:layout_alignLeft="@+id/textView10"
+        android:layout_alignStart="@+id/textView10" />
 
     <EditText
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="date"
+        android:inputType="phone"
         android:ems="10"
-        android:id="@+id/editText4" />
-
-    <CheckedTextView
-        android:text="Performance Assessment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/checkedTextView"
-        android:checkMark="@color/colorPrimaryDark" />
-
-    <CheckedTextView
-        android:text="Objective Assessment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/checkedTextView2"
-        android:checkMark="@color/colorPrimaryDark" />
-
-
-</LinearLayout>
+        android:id="@+id/etMentorPhone"
+        android:layout_alignBaseline="@+id/textView12"
+        android:layout_alignBottom="@+id/textView12"
+        android:layout_alignLeft="@+id/etMentorEmail"
+        android:layout_alignStart="@+id/etMentorEmail" />
+</RelativeLayout>

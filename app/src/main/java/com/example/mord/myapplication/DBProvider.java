@@ -48,6 +48,26 @@ public class DBProvider {
         values.put(DBOpenHelper.TERM_END_YEAR, term.getEndYear());
         database.insert(DBOpenHelper.TABLE_TERMS, null, values);
     }
+    public void add(Course course) {
+        ContentValues values = new ContentValues();
+        values.put(DBOpenHelper.COURSE_TITLE, course.getCourseTitle());
+        values.put(DBOpenHelper.COURSE_START_DAY, course.getStartDay());
+        values.put(DBOpenHelper.COURSE_START_MONTH, course.getStartMonth());
+        values.put(DBOpenHelper.COURSE_START_YEAR, course.getStartYear());
+        values.put(DBOpenHelper.COURSE_END_DAY, course.getEndDay());
+        values.put(DBOpenHelper.COURSE_END_MONTH, course.getEndMonth());
+        values.put(DBOpenHelper.COURSE_END_YEAR, course.getEndYear());
+        values.put(DBOpenHelper.COURSE_STATUS, course.getCourseStatus());
+        values.put(DBOpenHelper.COURSE_MENTOR, course.getCourseMentor());
+        database.insert(DBOpenHelper.TABLE_COURSES, null, values);
+    }
+    public void add(Mentor mentor) {
+        ContentValues values = new ContentValues();
+        values.put(DBOpenHelper.MENTOR_NAME, mentor.getName());
+        values.put(DBOpenHelper.MENTOR_EMAIL, mentor.getEmail());
+        values.put(DBOpenHelper.MENTOR_PHONE, mentor.getPhone());
+        database.insert(DBOpenHelper.TABLE_MENTORS, null, values);
+    }
 
     public void update(String oldTerm, Term term) {
         ContentValues values = new ContentValues();

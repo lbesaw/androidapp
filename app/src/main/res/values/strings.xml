@@ -5,4 +5,10 @@
     <string name="title_activity_editor">EditorActivity</string>
     <string name="title_activity_term_editor">TermEditor</string>
     <string name="title_activity_course_editor">CourseEditor</string>
+    <string-array name="status_array">
+        <item>In progress</item>
+        <item>Completed</item>
+        <item>Dropped</item>
+        <item>Planned</item>
+    </string-array>
 </resources>

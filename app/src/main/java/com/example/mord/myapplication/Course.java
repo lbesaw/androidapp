@@ -13,9 +13,9 @@ public class Course implements Serializable {
     private String courseTitle;
     private String courseStatus;
     private String termTitle;
+    private String courseMentor;
     private int startDay, startMonth, startYear;
     private int endDay, endMonth, endYear;
-    private List<Mentor> courseMentors = new ArrayList<>();
     private List<String> courseAssessments;
     private List<String> courseTextNotes;
 
@@ -24,7 +24,6 @@ public class Course implements Serializable {
                   int startMonth, int startYear, int endDay, int endMonth, int endYear) {
         this.courseTitle = courseTitle;
         this.courseStatus = courseStatus;
-        courseMentors.add(courseMentor);
         this.courseAssessments = Arrays.asList(courseAssessments);
         this.courseTextNotes = Arrays.asList(courseTextNotes);
         this.startDay=startDay;
@@ -37,7 +36,16 @@ public class Course implements Serializable {
     public Course() {
         super();
     }
-
+public void setStartDate(int startDay, int startMonth, int startYear) {
+    this.startDay = startDay;
+    this.startMonth = startMonth;
+    this.startYear = startYear;
+}
+    public void setEndDate(int endDay, int endMonth, int endYear) {
+        this.endDay = endDay;
+        this.endMonth = endMonth;
+        this.endYear = endYear;
+    }
     public String getTermTitle() {
         return termTitle;
     }
@@ -113,5 +121,11 @@ public class Course implements Serializable {
 
     public void setEndYear(int endYear) {
         this.endYear = endYear;
+    }
+    public void setCourseMentor(String mentor) {
+        this.courseMentor = mentor;
+    }
+    public String getCourseMentor() {
+        return courseMentor;
     }
 }
