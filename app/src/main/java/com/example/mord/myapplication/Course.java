@@ -128,4 +128,8 @@ public void setStartDate(int startDay, int startMonth, int startYear) {
     public String getCourseMentor() {
         return courseMentor;
     }
+
+    public String toString() {
+        return courseTitle + " - "+ startMonth+"/"+startDay+"/"+startYear;
+    }
 }

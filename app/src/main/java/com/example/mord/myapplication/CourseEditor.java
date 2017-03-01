@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -27,13 +28,15 @@ import java.util.TimeZone;
 
 public class CourseEditor extends AppCompatActivity {
 private Term thisTerm;
-    private static final int EDITOR_REQUEST_CODE = 666;
+    private static final int EDITOR_REQUEST_CODE = 6661;
     private Course thisCourse = new Course();
     private ArrayAdapter<Course> courseListAdapter;
     private List<Course> courseList;
     private DBProvider provider;
     private ListView list;
     private Mentor mentor;
+    private String action;
+    private String course;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,33 @@ private Term thisTerm;
         provider.open();
         Bundle bundle = getIntent().getExtras();
         final String termTitle = (String) bundle.get("termTitle");
+        final String id = (String) bundle.get("courseTitle");
+        final TextView tvStartDate = (TextView) findViewById(R.id.tvStartDate);
+        final TextView tvEndDate = (TextView) findViewById(R.id.tvEndDate);
+        final EditText courseName = (EditText) findViewById(R.id.courseEditorCourseName);
+        TextView tvMentorName = (TextView) findViewById(R.id.mentorName);
+        final TextView tvMentorname = (TextView) findViewById(R.id.mentorName);
+        final TextView tvMentoremail = (TextView) findViewById(R.id.mentorEmail);
+        final TextView tvMentorphone = (TextView) findViewById(R.id.mentorPhone);
+        final Spinner spinner = (Spinner) findViewById(R.id.statusSpinner);
+        if(id == null)
+            action = Intent.ACTION_INSERT;
+        else {
+            DBProvider provider = new DBProvider(this);
+            provider.open();
+            action = Intent.ACTION_EDIT;
+            thisCourse = provider.getCourse(id);
+            Mentor mentor;
+            if(thisCourse.getCourseMentor()!= null) {
+                mentor = provider.getMentor(thisCourse);
+                tvMentorname.setText(mentor.getName());
+                tvMentoremail.setText(mentor.getEmail());
+                tvMentorphone.setText(mentor.getPhone());
+            }
+            courseName.setText(thisCourse.getCourseTitle());
+            tvStartDate.setText(thisCourse.getStartMonth()+"/"+thisCourse.getStartDay()+"/"+thisCourse.getStartYear());
+            tvEndDate.setText(thisCourse.getEndMonth()+"/"+thisCourse.getEndDay()+"/"+thisCourse.getEndYear());
+        }
         thisTerm = provider.getTerm(termTitle);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -61,8 +91,7 @@ private Term thisTerm;
                 onBackPressed();
             }
         });
-        final TextView tvStartDate = (TextView) findViewById(R.id.tvStartDate);
-        final TextView tvEndDate = (TextView) findViewById(R.id.tvEndDate);
+
 
         tvStartDate.setOnClickListener(new View.OnClickListener() {
 
@@ -120,7 +149,7 @@ private Term thisTerm;
             }
         });
 
-        TextView tvMentorName = (TextView) findViewById(R.id.mentorName);
+
 
         tvMentorName.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,7 +158,7 @@ private Term thisTerm;
             }
         });
 
-        Spinner spinner = (Spinner) findViewById(R.id.statusSpinner);
+
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.status_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -157,19 +186,19 @@ private Term thisTerm;
             public void onClick(DialogInterface dialog, int which) {
 
 
-                String mName = mentorName.getText().toString();
-                String mEmail = mentorEmail.getText().toString();
-                String mPhone = mentorPhone.getText().toString();
+                String mName = mentorName.getText().toString().trim();
+                String mEmail = mentorEmail.getText().toString().trim();
+                String mPhone = mentorPhone.getText().toString().trim();
                 mentor = new Mentor(mName, mEmail, mPhone);
                 provider.open();
                 provider.add(mentor);
                 provider.close();
-                thisCourse.setCourseMentor(mName);
+
 
                 tvMentorname.setText(mName);
                 tvMentoremail.setText(mEmail);
                 tvMentorphone.setText(mPhone);
-                Toast.makeText(CourseEditor.this, "Mentor added!", Toast.LENGTH_SHORT).show();
+                thisCourse.setCourseMentor(mName);
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -183,6 +212,27 @@ private Term thisTerm;
 
     }
 
+    private void finishedEditing() {
+        final EditText courseName = (EditText) findViewById(R.id.courseEditorCourseName);
+
+        switch(action) {
+            case Intent.ACTION_INSERT:
+                insertCourse(courseName.getText().toString().trim());
+                break;
+            case Intent.ACTION_EDIT:
+                DBProvider provider = new DBProvider(this);
+                provider.open();
+                course=thisCourse.getCourseTitle();
+                thisCourse.setCourseTitle(courseName.getText().toString());
+                Toast.makeText(this, thisCourse.getCourseMentor(), Toast.LENGTH_LONG).show();
+                provider.update(course, thisCourse);
+                setResult(RESULT_OK);
+                provider.close();
+                break;
+        }
+        finish();
+    }
+
     public void insertCourse(String courseTitle) {
         thisCourse.setCourseTitle(courseTitle);
         DBProvider provider = new DBProvider(this);
@@ -190,7 +240,6 @@ private Term thisTerm;
         provider.add(thisCourse);
         provider.close();
         setResult(RESULT_OK);
-        Toast.makeText(this, "RESULTS POSTED", Toast.LENGTH_LONG).show();
 
     }
 
@@ -206,11 +255,13 @@ private Term thisTerm;
     }
     @Override
     public void onBackPressed() {
-        Toast.makeText(this, "HELLOOOOO", Toast.LENGTH_LONG).show();
+        finishedEditing();
         Intent intent = new Intent(this, TermEditor.class);
         Bundle bundle = new Bundle();
         bundle.putString("termTitle", thisTerm.getTermTitle());
+
         intent.putExtras(bundle);
         startActivityForResult(intent, EDITOR_REQUEST_CODE);
+
     }
 }

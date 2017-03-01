@@ -81,6 +81,20 @@ public class DBProvider {
         database.update(DBOpenHelper.TABLE_TERMS, values, DBOpenHelper.TERM_TITLE +"=\""+oldTerm+"\"", null);
     }
 
+    public void update(String oldCourse, Course course) {
+        ContentValues values = new ContentValues();
+        values.put(DBOpenHelper.COURSE_TITLE, course.getCourseTitle());
+        values.put(DBOpenHelper.COURSE_START_DAY, course.getStartDay());
+        values.put(DBOpenHelper.COURSE_START_MONTH, course.getStartMonth());
+        values.put(DBOpenHelper.COURSE_START_YEAR, course.getStartYear());
+        values.put(DBOpenHelper.COURSE_END_DAY, course.getEndDay());
+        values.put(DBOpenHelper.COURSE_END_MONTH, course.getEndMonth());
+        values.put(DBOpenHelper.COURSE_END_YEAR, course.getEndYear());
+        values.put(DBOpenHelper.COURSE_STATUS, course.getCourseStatus());
+        values.put(DBOpenHelper.COURSE_MENTOR, course.getCourseMentor());
+        database.update(DBOpenHelper.TABLE_COURSES, values, DBOpenHelper.COURSE_TITLE +"='"+oldCourse+"'", null);
+    }
+
     public Term getTerm(String termName) {
         Cursor cursor = database.query(DBOpenHelper.TABLE_TERMS, TERMS_ALL_COLUMNS, DBOpenHelper.TERM_TITLE + " = ?", new String[] {termName}, null, null, null);
         Term term = new Term();
@@ -117,6 +131,37 @@ public class DBProvider {
             }
         }
         return terms;
+    }
+
+    public Course getCourse(String id) {
+        Cursor cursor = database.query(DBOpenHelper.TABLE_COURSES, COURSES_ALL_COLUMNS, DBOpenHelper.COURSE_TITLE + " like '"+ id+"'", null, null, null, null);
+        if(cursor.getCount() > 0) {
+           cursor.moveToFirst();
+            Course course = new Course();
+            course.setTermTitle(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_TERM)));
+            course.setCourseTitle(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_TITLE)));
+            course.setStartDay(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.COURSE_START_DAY)));
+            course.setStartMonth(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.COURSE_START_MONTH)));
+            course.setStartYear(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.COURSE_START_YEAR)));
+            course.setEndDay(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.COURSE_END_DAY)));
+            course.setEndMonth(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.COURSE_END_MONTH)));
+            course.setEndYear(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.COURSE_END_YEAR)));
+            course.setCourseStatus(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_STATUS)));
+            course.setCourseMentor(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_MENTOR)));
+            return course;
+            }
+        return null;
+        }
+    public Mentor getMentor(Course course) {
+        Cursor cursor = database.query(DBOpenHelper.TABLE_MENTORS, MENTORS_ALL_COLUMNS, DBOpenHelper.MENTOR_NAME + " like '"+ course.getCourseMentor()+"'", null, null, null, null);
+        if(cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            Mentor mentor = new Mentor(cursor.getString(cursor.getColumnIndex(DBOpenHelper.MENTOR_NAME)),
+                    cursor.getString(cursor.getColumnIndex(DBOpenHelper.MENTOR_EMAIL)),
+                    cursor.getString(cursor.getColumnIndex(DBOpenHelper.MENTOR_PHONE)));
+            return mentor;
+        }
+        return null;
     }
     public List<Course> getCourses(Term term) {
         List<Course> courses = new ArrayList<>();

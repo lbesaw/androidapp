@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -25,6 +26,7 @@ public class TermEditor extends AppCompatActivity {
     private ListView list;
     private ArrayAdapter<Course> courseListAdapter;
     private List<Course> courseList;
+    private int EDITOR_REQUEST_CODE = 6661;
     String termTitle;
     Term thisTerm = new Term();
     String term;
@@ -50,6 +52,8 @@ public class TermEditor extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         final String id = (String) bundle.get("termTitle");
+
+
 
         if(id == null) {
             action = Intent.ACTION_INSERT;
@@ -127,6 +131,19 @@ public class TermEditor extends AppCompatActivity {
             }
         });
         displayCourses();
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(TermEditor.this, CourseEditor.class);
+                Course course = (Course) parent.getAdapter().getItem(position);
+                Bundle bundle = new Bundle();
+                bundle.putString("termTitle", termInputName.getText().toString().trim());
+                bundle.putString("courseTitle", course.getCourseTitle());
+                intent.putExtras(bundle);
+//                intent.putExtra(DBProvider.CONTENT_ITEM_TYPE, term.getTermTitle());
+                startActivityForResult(intent, EDITOR_REQUEST_CODE);
+            }
+        });
     }
 
     private void finishedEditing() {
