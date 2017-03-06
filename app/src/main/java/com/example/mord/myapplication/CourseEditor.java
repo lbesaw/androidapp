@@ -80,7 +80,13 @@ private Term thisTerm;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-        //// ADD NOTE BUTTON
+                Intent intent = new Intent(CourseEditor.this, Notes.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("termTitle", thisTerm.getTermTitle());
+                bundle.putString("courseTitle", thisCourse.getCourseTitle());
+
+                intent.putExtras(bundle);
+                startActivityForResult(intent, EDITOR_REQUEST_CODE);
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -209,6 +215,7 @@ private Term thisTerm;
         });
 
         builder.show();
+
 
     }
 

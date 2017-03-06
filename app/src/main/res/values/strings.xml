@@ -11,4 +11,5 @@
         <item>Dropped</item>
         <item>Planned</item>
     </string-array>
+    <string name="title_activity_notes">Notes</string>
 </resources>
