@@ -21,8 +21,15 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -34,6 +41,10 @@ import java.io.OutputStream;
 public class Notes extends AppCompatActivity {
 
     private String filename;
+    private String action;
+    private String id;
+    private Course thisCourse;
+    public static final int EDITOR_REQUEST_CODE = 191;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -45,10 +56,29 @@ public class Notes extends AppCompatActivity {
         filename = (String) bundle.get("termTitle") + (String) bundle.get("courseTitle");
         verifyStoragePermissions(this);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        TextView tvNote = (TextView) findViewById(R.id.tvNote);
+        DBProvider provider = new DBProvider(this);
+        provider.open();
+        thisCourse = provider.getCourse((String) bundle.get("courseTitle"));
+        provider.close();
+        if(thisCourse.getNotes() == null)
+            action = Intent.ACTION_INSERT;
+        else {
+            action = Intent.ACTION_EDIT;
+            tvNote.setText(thisCourse.getNotes());
+        }
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 selectImage();
+            }
+        });
+
+        tvNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addNote();
             }
         });
         ImageView a = (ImageView) findViewById(R.id.ivNote);
@@ -137,7 +167,31 @@ public class Notes extends AppCompatActivity {
 
     }
 
+    public void addNote(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.content_addnote, null);
+        final TextView tvNote = (TextView) findViewById(R.id.tvNote);
+        builder.setView(dialogView);
+        builder.setTitle("Add notes");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                EditText dvEt = (EditText) dialogView.findViewById(R.id.etDv);
+                tvNote.setText(dvEt.getText().toString());
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
 
+        builder.show();
+
+
+    }
     @Override
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -305,5 +359,37 @@ catch (IOException e) {
                     REQUEST_EXTERNAL_STORAGE
             );
         }
+    }
+    private void finishedEditing() {
+                TextView etNote = (TextView) findViewById(R.id.tvNote);
+                thisCourse.setNotes(etNote.getText().toString());
+                DBProvider provider = new DBProvider(this);
+                provider.open();
+                Toast.makeText(this, filename, Toast.LENGTH_LONG).show();
+                provider.update(thisCourse.getCourseTitle(), thisCourse);
+                setResult(RESULT_OK);
+                provider.close();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            onBackPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+    @Override
+    public void onBackPressed() {
+        finishedEditing();
+        Intent intent = new Intent(this, TermEditor.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("courseTitle", thisCourse.getTermTitle());
+
+        intent.putExtras(bundle);
+        startActivityForResult(intent, EDITOR_REQUEST_CODE);
+
     }
 }

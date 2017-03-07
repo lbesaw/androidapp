@@ -18,7 +18,7 @@ public class Course implements Serializable {
     private int endDay, endMonth, endYear;
     private List<String> courseAssessments;
     private List<String> courseTextNotes;
-
+    private String notes;
     public Course(String courseTitle, String courseStatus, Mentor courseMentor,
                   String[] courseAssessments, String[] courseTextNotes, int startDay,
                   int startMonth, int startYear, int endDay, int endMonth, int endYear) {
@@ -127,6 +127,13 @@ public void setStartDate(int startDay, int startMonth, int startYear) {
     }
     public String getCourseMentor() {
         return courseMentor;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     public String toString() {

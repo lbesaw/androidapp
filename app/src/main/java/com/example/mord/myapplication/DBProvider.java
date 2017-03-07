@@ -59,6 +59,7 @@ public class DBProvider {
         values.put(DBOpenHelper.COURSE_END_YEAR, course.getEndYear());
         values.put(DBOpenHelper.COURSE_STATUS, course.getCourseStatus());
         values.put(DBOpenHelper.COURSE_MENTOR, course.getCourseMentor());
+        values.put(DBOpenHelper.COURSE_TEXT_NOTES, course.getNotes());
         database.insert(DBOpenHelper.TABLE_COURSES, null, values);
     }
     public void add(Mentor mentor) {
@@ -92,6 +93,7 @@ public class DBProvider {
         values.put(DBOpenHelper.COURSE_END_YEAR, course.getEndYear());
         values.put(DBOpenHelper.COURSE_STATUS, course.getCourseStatus());
         values.put(DBOpenHelper.COURSE_MENTOR, course.getCourseMentor());
+        values.put(DBOpenHelper.COURSE_TEXT_NOTES, course.getNotes());
         database.update(DBOpenHelper.TABLE_COURSES, values, DBOpenHelper.COURSE_TITLE +"='"+oldCourse+"'", null);
     }
 
@@ -148,6 +150,7 @@ public class DBProvider {
             course.setEndYear(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.COURSE_END_YEAR)));
             course.setCourseStatus(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_STATUS)));
             course.setCourseMentor(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_MENTOR)));
+            course.setNotes(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_TEXT_NOTES)));
             return course;
             }
         return null;
