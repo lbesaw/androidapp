@@ -12,4 +12,6 @@
         <item>Planned</item>
     </string-array>
     <string name="title_activity_notes">Notes</string>
+    <string name="title_activity_assessment_list">AssessmentList</string>
+    <string name="title_activity_assessment_detail">AssessmentDetail</string>
 </resources>

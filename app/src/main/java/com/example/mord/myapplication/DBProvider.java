@@ -37,6 +37,18 @@ public class DBProvider {
 
     public void close() { dbhelper.close();}
 
+    public void add(Assessment assessment) {
+    ContentValues values = new ContentValues();
+        values.put(DBOpenHelper.ASSESSMENT_COURSE, assessment.getCourse());
+        values.put(DBOpenHelper.ASSESSMENT_DUE_DAY, assessment.getDay());
+        values.put(DBOpenHelper.ASSESSMENT_DUE_MONTH, assessment.getMonth());
+        values.put(DBOpenHelper.ASSESSMENT_DUE_YEAR, assessment.getYear());
+        values.put(DBOpenHelper.ASSESSMENT_TYPE, assessment.getType());
+        values.put(DBOpenHelper.ASSESSMENT_TEXT_NOTES, assessment.getNote());
+        values.put(DBOpenHelper.ASSESSMENT_ID, assessment.getCourse()+assessment.getType());
+        database.insert(DBOpenHelper.TABLE_ASSESSMENTS, null, values);
+
+    }
     public void add(Term term) {
         ContentValues values = new ContentValues();
         values.put(DBOpenHelper.TERM_TITLE, term.getTermTitle());
@@ -60,6 +72,7 @@ public class DBProvider {
         values.put(DBOpenHelper.COURSE_STATUS, course.getCourseStatus());
         values.put(DBOpenHelper.COURSE_MENTOR, course.getCourseMentor());
         values.put(DBOpenHelper.COURSE_TEXT_NOTES, course.getNotes());
+        values.put(DBOpenHelper.COURSE_STATUS, course.getCourseStatus());
         database.insert(DBOpenHelper.TABLE_COURSES, null, values);
     }
     public void add(Mentor mentor) {
@@ -70,6 +83,16 @@ public class DBProvider {
         database.insert(DBOpenHelper.TABLE_MENTORS, null, values);
     }
 
+    public void update(String oldAssessment, Assessment assessment) {
+        ContentValues values = new ContentValues();
+        values.put(DBOpenHelper.ASSESSMENT_COURSE, assessment.getCourse());
+        values.put(DBOpenHelper.ASSESSMENT_DUE_DAY, assessment.getDay());
+        values.put(DBOpenHelper.ASSESSMENT_DUE_MONTH, assessment.getMonth());
+        values.put(DBOpenHelper.ASSESSMENT_DUE_YEAR, assessment.getYear());
+        values.put(DBOpenHelper.ASSESSMENT_TYPE, assessment.getType());
+        values.put(DBOpenHelper.ASSESSMENT_TEXT_NOTES, assessment.getNote());
+        database.update(DBOpenHelper.TABLE_ASSESSMENTS, values, DBOpenHelper.ASSESSMENT_ID +"=\""+oldAssessment+"\"", null);
+    }
     public void update(String oldTerm, Term term) {
         ContentValues values = new ContentValues();
         values.put(DBOpenHelper.TERM_TITLE, term.getTermTitle());
@@ -94,9 +117,25 @@ public class DBProvider {
         values.put(DBOpenHelper.COURSE_STATUS, course.getCourseStatus());
         values.put(DBOpenHelper.COURSE_MENTOR, course.getCourseMentor());
         values.put(DBOpenHelper.COURSE_TEXT_NOTES, course.getNotes());
+        values.put(DBOpenHelper.COURSE_STATUS, course.getCourseStatus());
         database.update(DBOpenHelper.TABLE_COURSES, values, DBOpenHelper.COURSE_TITLE +"='"+oldCourse+"'", null);
     }
 
+    public Assessment getAssessment(String assName) {
+        Cursor cursor = database.query(DBOpenHelper.TABLE_ASSESSMENTS, ASSESSMENTS_ALL_COLUMNS, DBOpenHelper.ASSESSMENT_ID + " = ?", new String[] {assName}, null, null, null);
+        Assessment assessment = new Assessment();
+        if(cursor.getCount() > 0) {
+            while(cursor.moveToNext()) {
+                assessment.setCourse(cursor.getString(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_COURSE)));
+                assessment.setDay(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_DUE_DAY)));
+                assessment.setMonth(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_DUE_MONTH)));
+                assessment.setYear(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_DUE_YEAR)));
+                assessment.setType(cursor.getString(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_TYPE)));
+                assessment.setNote(cursor.getString(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_TEXT_NOTES)));
+            }
+        }
+        return assessment;
+    }
     public Term getTerm(String termName) {
         Cursor cursor = database.query(DBOpenHelper.TABLE_TERMS, TERMS_ALL_COLUMNS, DBOpenHelper.TERM_TITLE + " = ?", new String[] {termName}, null, null, null);
         Term term = new Term();
@@ -151,6 +190,7 @@ public class DBProvider {
             course.setCourseStatus(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_STATUS)));
             course.setCourseMentor(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_MENTOR)));
             course.setNotes(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_TEXT_NOTES)));
+            course.setCourseStatus(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_STATUS)));
             return course;
             }
         return null;

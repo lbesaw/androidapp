@@ -23,9 +23,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,9 +47,27 @@ public class Notes extends AppCompatActivity {
 
     private String filename;
     private String action;
-    private String id;
     private Course thisCourse;
     public static final int EDITOR_REQUEST_CODE = 191;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_note, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_item_share:
+                shareIt();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -75,6 +98,7 @@ public class Notes extends AppCompatActivity {
             }
         });
 
+
         tvNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,8 +106,9 @@ public class Notes extends AppCompatActivity {
             }
         });
         ImageView a = (ImageView) findViewById(R.id.ivNote);
-        String extStorageDirectory = Environment.getExternalStorageDirectory().toString()+"/wgunote";
-        File file = new File(extStorageDirectory+"/", filename+".png");
+
+        final String extStorageDirectory = Environment.getExternalStorageDirectory().toString()+"/wgunote";
+        final File file = new File(extStorageDirectory+"/", filename+".png");
         if (file.exists()) {
             Uri bitmapUri = Uri.fromFile(file);
             Bitmap bitmap = null;
@@ -94,9 +119,36 @@ public class Notes extends AppCompatActivity {
                 e.printStackTrace();
             }
             a.setImageBitmap(bitmap);
+            a.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Uri uri =  Uri.fromFile(file);
+                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
+                    String mime = "*/*";
+                    MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+                    if (mimeTypeMap.hasExtension(
+                            mimeTypeMap.getFileExtensionFromUrl(uri.toString())))
+                        mime = mimeTypeMap.getMimeTypeFromExtension(
+                                mimeTypeMap.getFileExtensionFromUrl(uri.toString()));
+                    intent.setDataAndType(uri,mime);
+                    startActivity(intent);
+                }
+            });
         }
-    }
 
+    }
+    public void shareIt() {
+        final String extStorageDirectory = Environment.getExternalStorageDirectory().toString()+"/wgunote";
+        final File file = new File(extStorageDirectory+"/", filename+".png");
+        final TextView tvNote = (TextView) findViewById(R.id.tvNote);
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("image/jpeg");
+        String shareBody = tvNote.getText().toString();
+        //sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, shareBody);
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+        sharingIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+        startActivity(Intent.createChooser(sharingIntent, "Share via"));
+    }
 
     private File savebitmap(Bitmap bmp) {
         String extStorageDirectory = Environment.getExternalStorageDirectory().toString()+"/wgunote";
@@ -173,7 +225,13 @@ public class Notes extends AppCompatActivity {
         final View dialogView = inflater.inflate(R.layout.content_addnote, null);
         final TextView tvNote = (TextView) findViewById(R.id.tvNote);
         builder.setView(dialogView);
-        builder.setTitle("Add notes");
+        EditText dvet = (EditText) dialogView.findViewById(R.id.etDv);
+        if(!tvNote.getText().toString().equals("Click here to add notes")) {
+        dvet.setText(tvNote.getText().toString());
+            builder.setTitle("Edit note");}
+        else {
+            builder.setTitle("Add notes");
+        }
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -386,7 +444,7 @@ catch (IOException e) {
         finishedEditing();
         Intent intent = new Intent(this, TermEditor.class);
         Bundle bundle = new Bundle();
-        bundle.putString("courseTitle", thisCourse.getTermTitle());
+        bundle.putString("courseTitle", thisCourse.getCourseTitle());
 
         intent.putExtras(bundle);
         startActivityForResult(intent, EDITOR_REQUEST_CODE);

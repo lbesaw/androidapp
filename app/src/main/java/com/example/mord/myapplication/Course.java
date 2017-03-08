@@ -16,7 +16,7 @@ public class Course implements Serializable {
     private String courseMentor;
     private int startDay, startMonth, startYear;
     private int endDay, endMonth, endYear;
-    private List<String> courseAssessments;
+    private List<String> courseAssessments = new ArrayList<>();
     private List<String> courseTextNotes;
     private String notes;
     public Course(String courseTitle, String courseStatus, Mentor courseMentor,
@@ -55,6 +55,9 @@ public void setStartDate(int startDay, int startMonth, int startYear) {
     }
     public void addAssessment(String assessment) {
         courseAssessments.add(assessment);
+    }
+    public List<String> getCourseAssessments() {
+        return courseAssessments;
     }
     public void addNote(String note) {
         courseTextNotes.add(note);

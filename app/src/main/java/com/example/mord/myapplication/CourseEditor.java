@@ -1,5 +1,6 @@
 package com.example.mord.myapplication;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -26,17 +28,15 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
-public class CourseEditor extends AppCompatActivity {
+public class CourseEditor extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 private Term thisTerm;
     private static final int EDITOR_REQUEST_CODE = 6661;
     private Course thisCourse = new Course();
-    private ArrayAdapter<Course> courseListAdapter;
-    private List<Course> courseList;
     private DBProvider provider;
-    private ListView list;
     private Mentor mentor;
     private String action;
     private String course;
+    private String status;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +57,11 @@ private Term thisTerm;
         final TextView tvMentoremail = (TextView) findViewById(R.id.mentorEmail);
         final TextView tvMentorphone = (TextView) findViewById(R.id.mentorPhone);
         final Spinner spinner = (Spinner) findViewById(R.id.statusSpinner);
-        if(id == null)
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.status_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
+        if (id == null)
             action = Intent.ACTION_INSERT;
         else {
             DBProvider provider = new DBProvider(this);
@@ -65,21 +69,40 @@ private Term thisTerm;
             action = Intent.ACTION_EDIT;
             thisCourse = provider.getCourse(id);
             Mentor mentor;
-            if(thisCourse.getCourseMentor()!= null) {
+            if(thisCourse.getCourseStatus()!=null) {
+                if(thisCourse.getCourseStatus().equals("In progress")) {
+                    spinner.setSelection(0);
+                    Toast.makeText(this, thisCourse.getCourseStatus(), Toast.LENGTH_LONG).show();
+                }
+                if(thisCourse.getCourseStatus().equals("Completed")) {
+                    spinner.setSelection(1);
+                    Toast.makeText(this, thisCourse.getCourseStatus(), Toast.LENGTH_LONG).show();
+                }
+                if(thisCourse.getCourseStatus().equals("Dropped")) {
+                    spinner.setSelection(2);
+                    Toast.makeText(this, thisCourse.getCourseStatus(), Toast.LENGTH_LONG).show();
+                }
+                if(thisCourse.getCourseStatus().equals("Planned")) {
+                    spinner.setSelection(3);
+                    Toast.makeText(this, thisCourse.getCourseStatus(), Toast.LENGTH_LONG).show();
+                }
+            }
+            if (thisCourse.getCourseMentor() != null) {
                 mentor = provider.getMentor(thisCourse);
                 tvMentorname.setText(mentor.getName());
                 tvMentoremail.setText(mentor.getEmail());
                 tvMentorphone.setText(mentor.getPhone());
             }
             courseName.setText(thisCourse.getCourseTitle());
-            tvStartDate.setText(thisCourse.getStartMonth()+"/"+thisCourse.getStartDay()+"/"+thisCourse.getStartYear());
-            tvEndDate.setText(thisCourse.getEndMonth()+"/"+thisCourse.getEndDay()+"/"+thisCourse.getEndYear());
+            tvStartDate.setText(thisCourse.getStartMonth() + "/" + thisCourse.getStartDay() + "/" + thisCourse.getStartYear());
+            tvEndDate.setText(thisCourse.getEndMonth() + "/" + thisCourse.getEndDay() + "/" + thisCourse.getEndYear());
         }
         thisTerm = provider.getTerm(termTitle);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                finishedEditing();
                 Intent intent = new Intent(CourseEditor.this, Notes.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("termTitle", thisTerm.getTermTitle());
@@ -109,7 +132,7 @@ private Term thisTerm;
                     public void onDateSet(DatePicker view, int selectedYear,
                                           int selectedMonth, int selectedDay) {
                         tvStartDate.setText(selectedMonth + 1 + "/" + selectedDay + "/" + selectedYear);
-                        thisCourse.setStartDate(selectedDay, selectedMonth+1, selectedYear);
+                        thisCourse.setStartDate(selectedDay, selectedMonth + 1, selectedYear);
                     }
                 };
                 Calendar cal = Calendar.getInstance(TimeZone.getDefault()); // Get current date
@@ -137,7 +160,7 @@ private Term thisTerm;
                     public void onDateSet(DatePicker view, int selectedYear,
                                           int selectedMonth, int selectedDay) {
                         tvEndDate.setText(selectedMonth + 1 + "/" + selectedDay + "/" + selectedYear);
-                        thisCourse.setEndDate(selectedDay, selectedMonth+1, selectedYear);
+                        thisCourse.setEndDate(selectedDay, selectedMonth + 1, selectedYear);
                     }
                 };
                 Calendar cal = Calendar.getInstance(TimeZone.getDefault()); // Get current date
@@ -156,7 +179,6 @@ private Term thisTerm;
         });
 
 
-
         tvMentorName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -165,11 +187,20 @@ private Term thisTerm;
         });
 
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.status_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
 
     }
+
+        @Override
+        public void onItemSelected (AdapterView < ? > adapterView, View view,int i, long l){
+            status = adapterView.getItemAtPosition(i).toString();
+            thisCourse.setCourseStatus(status);
+            //Toast.makeText(this, thisCourse.getCourseStatus(), Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onNothingSelected (AdapterView < ? > adapterView){
+
+        }
 
     public void addMentor(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
