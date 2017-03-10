@@ -1,12 +1,10 @@
 package com.example.mord.myapplication;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,17 +13,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.util.Calendar;
-import java.util.List;
 import java.util.TimeZone;
 
 public class CourseEditor extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -57,10 +52,12 @@ private Term thisTerm;
         final TextView tvMentoremail = (TextView) findViewById(R.id.mentorEmail);
         final TextView tvMentorphone = (TextView) findViewById(R.id.mentorPhone);
         final Spinner spinner = (Spinner) findViewById(R.id.statusSpinner);
+        final Button assessmentsButton = (Button) findViewById(R.id.assessmentsButton);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.status_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
+        thisCourse.setTermTitle(termTitle);
         if (id == null)
             action = Intent.ACTION_INSERT;
         else {
@@ -178,7 +175,19 @@ private Term thisTerm;
             }
         });
 
+        assessmentsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finishedEditing();
+                Intent intent = new Intent(CourseEditor.this, AssessmentList.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("termTitle", thisTerm.getTermTitle());
+                bundle.putString("courseTitle", thisCourse.getCourseTitle());
 
+                intent.putExtras(bundle);
+                startActivityForResult(intent, EDITOR_REQUEST_CODE);
+            }
+        });
         tvMentorName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -189,6 +198,7 @@ private Term thisTerm;
 
 
     }
+
 
         @Override
         public void onItemSelected (AdapterView < ? > adapterView, View view,int i, long l){
@@ -252,7 +262,7 @@ private Term thisTerm;
 
     private void finishedEditing() {
         final EditText courseName = (EditText) findViewById(R.id.courseEditorCourseName);
-
+        thisCourse.setTermTitle(thisTerm.getTermTitle());
         switch(action) {
             case Intent.ACTION_INSERT:
                 insertCourse(courseName.getText().toString().trim());

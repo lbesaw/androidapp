@@ -23,8 +23,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -126,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void displayTerms() {
         termList = datasource.getTerms();
-        termListAdapter = new ArrayAdapter<>(this, R.layout.note_list_item, R.id.tvNote, termList);
+        termListAdapter = new ArrayAdapter<>(this, R.layout.note_list_item, R.id.tvNote1, termList);
         list.setAdapter(termListAdapter);
     }
 

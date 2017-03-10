@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -66,6 +67,7 @@ public class TermEditor extends AppCompatActivity {
             termInputName.setText(thisTerm.getTermTitle());
             startDateEditText.setText(thisTerm.getStartMonth()+1+ "/"+thisTerm.getStartDay()+"/"+thisTerm.getStartYear());
             endDateEditText.setText(thisTerm.getEndMonth()+1+ "/"+thisTerm.getEndDay()+"/"+thisTerm.getEndYear());
+            provider.close();
         }
 
         startDateEditText.setOnClickListener(new View.OnClickListener() {
@@ -202,12 +204,15 @@ public class TermEditor extends AppCompatActivity {
     }
 
     private void displayCourses() {
+
         DBProvider provider = new DBProvider(this);
         provider.open();
         courseList = provider.getCourses(thisTerm);
-        courseListAdapter = new ArrayAdapter<>(this, R.layout.note_list_item, R.id.tvNote, courseList);
+        courseListAdapter = new ArrayAdapter<>(this, R.layout.note_list_item, R.id.tvNote1, courseList);
         list.setAdapter(courseListAdapter);
         provider.close();
     }
+
+
 
 }

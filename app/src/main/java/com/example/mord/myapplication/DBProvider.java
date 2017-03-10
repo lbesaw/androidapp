@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,7 @@ public class DBProvider {
     public void close() { dbhelper.close();}
 
     public void add(Assessment assessment) {
+        System.out.println("COURSEDEBUG>>> "+ assessment.getCourse());
     ContentValues values = new ContentValues();
         values.put(DBOpenHelper.ASSESSMENT_COURSE, assessment.getCourse());
         values.put(DBOpenHelper.ASSESSMENT_DUE_DAY, assessment.getDay());
@@ -47,8 +49,7 @@ public class DBProvider {
         values.put(DBOpenHelper.ASSESSMENT_TEXT_NOTES, assessment.getNote());
         values.put(DBOpenHelper.ASSESSMENT_ID, assessment.getCourse()+assessment.getType());
         database.insert(DBOpenHelper.TABLE_ASSESSMENTS, null, values);
-
-    }
+                    }
     public void add(Term term) {
         ContentValues values = new ContentValues();
         values.put(DBOpenHelper.TERM_TITLE, term.getTermTitle());
@@ -62,6 +63,7 @@ public class DBProvider {
     }
     public void add(Course course) {
         ContentValues values = new ContentValues();
+        values.put(DBOpenHelper.COURSE_TERM, course.getTermTitle());
         values.put(DBOpenHelper.COURSE_TITLE, course.getCourseTitle());
         values.put(DBOpenHelper.COURSE_START_DAY, course.getStartDay());
         values.put(DBOpenHelper.COURSE_START_MONTH, course.getStartMonth());
@@ -107,6 +109,7 @@ public class DBProvider {
 
     public void update(String oldCourse, Course course) {
         ContentValues values = new ContentValues();
+        values.put(DBOpenHelper.COURSE_TERM, course.getTermTitle());
         values.put(DBOpenHelper.COURSE_TITLE, course.getCourseTitle());
         values.put(DBOpenHelper.COURSE_START_DAY, course.getStartDay());
         values.put(DBOpenHelper.COURSE_START_MONTH, course.getStartMonth());
@@ -190,7 +193,6 @@ public class DBProvider {
             course.setCourseStatus(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_STATUS)));
             course.setCourseMentor(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_MENTOR)));
             course.setNotes(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_TEXT_NOTES)));
-            course.setCourseStatus(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_STATUS)));
             return course;
             }
         return null;
@@ -208,7 +210,7 @@ public class DBProvider {
     }
     public List<Course> getCourses(Term term) {
         List<Course> courses = new ArrayList<>();
-        Cursor cursor = database.query(DBOpenHelper.TABLE_COURSES, COURSES_ALL_COLUMNS, null /*DBOpenHelper.COURSE_TERM + " = \""+term.getTermTitle()+"\""*/, null, null, null, null);
+        Cursor cursor = database.query(DBOpenHelper.TABLE_COURSES, COURSES_ALL_COLUMNS, DBOpenHelper.COURSE_TERM + " like '"+term.getTermTitle()+"'", null, null, null, null);
         if(cursor.getCount() > 0) {
             while(cursor.moveToNext()) {
                 Course course = new Course();
@@ -221,9 +223,28 @@ public class DBProvider {
                 course.setEndMonth(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.COURSE_END_MONTH)));
                 course.setEndYear(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.COURSE_END_YEAR)));
                 course.setCourseStatus(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_STATUS)));
+                course.setNotes(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_TEXT_NOTES)));
+                course.setCourseMentor(cursor.getString(cursor.getColumnIndex(DBOpenHelper.COURSE_MENTOR)));
                 courses.add(course);
             }
         }
         return courses;
+    }
+    public List<Assessment> getAssessments(Course course) {
+        List<Assessment> assessments = new ArrayList<>();
+        Cursor cursor = database.query(DBOpenHelper.TABLE_ASSESSMENTS, ASSESSMENTS_ALL_COLUMNS, null /*DBOpenHelper.ASSESSMENT_COURSE + " like '"+course.getCourseTitle()+"'"*/, null, null, null, null);
+        if(cursor.getCount() > 0) {
+            while(cursor.moveToNext()) {
+                Assessment assessment = new Assessment();
+                assessment.setCourse(cursor.getString(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_COURSE)));
+                assessment.setDay(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_DUE_DAY)));
+                assessment.setMonth(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_DUE_MONTH)));
+                assessment.setYear(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_DUE_YEAR)));
+                assessment.setType(cursor.getString(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_TYPE)));
+                assessment.setNote(cursor.getString(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_TEXT_NOTES)));
+                assessments.add(assessment);
+            }
+        }
+        return assessments;
     }
 }

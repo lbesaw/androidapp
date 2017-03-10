@@ -65,4 +65,12 @@ public class Assessment {
     public void setYear(int year) {
         this.year = year;
     }
+    public void setDueDate(int day, int month, int year) {
+        this.day = day;
+        this.month = month;
+        this.year = year;
+    }
+    public String toString() {
+        return type+" | Due: "+getDateAsString();
+    }
 }

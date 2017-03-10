@@ -1,30 +1,23 @@
 package com.example.mord.myapplication;
 
 import android.app.DatePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.AlertDialog;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class AssessmentDetail extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class AssessmentDetailOld extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private String type;
     private String action;
@@ -33,7 +26,7 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
     private Term term = new Term();
     private Course course = new Course();
     private Assessment thisAss = new Assessment();
-    private Spinner spinner;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +34,7 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        spinner = (Spinner) findViewById(R.id.assSpinner);
+        final Spinner spinner = (Spinner) findViewById(R.id.assSpinner);
         final TextView dueDate = (TextView) findViewById(R.id.dueDate);
         Bundle bundle = getIntent().getExtras();
         courseTitle = (String) bundle.get("courseTitle");
@@ -52,10 +45,7 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
         course = provider.getCourse(courseTitle);
         term = provider.getTerm(termTitle);
         provider.close();
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.ass_type, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(this);
+
         if (id == null)
             action = Intent.ACTION_INSERT;
         else {
@@ -70,9 +60,9 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
                 if (thisAss.getType().equals("Objective assessment"))
                     spinner.setSelection(1);
             }
-            dueDate.setText(thisAss.getDateAsString());
         }
-
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.status_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
         dueDate.setOnClickListener(new View.OnClickListener() {
@@ -91,7 +81,7 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
                 Calendar cal = Calendar.getInstance(TimeZone.getDefault()); // Get current date
 
 // Create the DatePickerDialog instance
-                DatePickerDialog datePicker = new DatePickerDialog(AssessmentDetail.this,
+                DatePickerDialog datePicker = new DatePickerDialog(AssessmentDetailOld.this,
                         R.style.AppTheme, datePickerListener,
                         cal.get(Calendar.YEAR),
                         cal.get(Calendar.MONTH),
@@ -106,7 +96,8 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -115,62 +106,31 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
     public void onItemSelected (AdapterView < ? > adapterView, View view,int i, long l){
         type = adapterView.getItemAtPosition(i).toString();
         thisAss.setType(type);
-        Toast.makeText(this, thisAss.getType(), Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, thisAss.getType(), Toast.LENGTH_LONG).show();
     }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-}
+
     @Override
     public void onNothingSelected (AdapterView < ? > adapterView){
 
     }
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(Integer.parseInt(android.os.Build.VERSION.SDK) > 5
-                && keyCode == KeyEvent.KEYCODE_BACK
-                && event.getRepeatCount() == 0) {
-            onBackPressed();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-    private void finishedEditing() {
-
-        DBProvider provider = new DBProvider(this);
-        thisAss.setCourse(course.getCourseTitle());
-        switch(action) {
-            case Intent.ACTION_INSERT:
-                provider.open();
-                provider.add(thisAss);
-                provider.close();
-                setResult(RESULT_OK);
-                break;
-            case Intent.ACTION_EDIT:
-                provider.open();
-                provider.update(thisAss.getCourse()+thisAss.getType(), thisAss);
-                setResult(RESULT_OK);
-                provider.close();
-                break;
-        }
-        finish();
-    }
-
-    @Override
-    public void onBackPressed() {
-        finishedEditing();
-        Intent intent = new Intent(AssessmentDetail.this, AssessmentList.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("termTitle", course.getTermTitle());
-        bundle.putString("courseTitle", course.getCourseTitle());
-        bundle.putString("assessmentTitle", thisAss.getCourse()+thisAss.getType());
-        intent.putExtras(bundle);
-        startActivity(intent);
-
-    }
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if(Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+//                && keyCode == KeyEvent.KEYCODE_BACK
+//                && event.getRepeatCount() == 0) {
+//            onBackPressed();
+//            return true;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
+//    @Override
+//    public void onBackPressed() {
+//        Intent intent = new Intent(AssessmentDetail.this, AssessmentList.class);
+//        Bundle bundle = new Bundle();
+//        bundle.putString("termTitle", course.getTermTitle());
+//        bundle.putString("courseTitle", course.getCourseTitle());
+//        intent.putExtras(bundle);
+//        startActivity(intent);
+//
+//    }
 }

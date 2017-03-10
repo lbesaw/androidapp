@@ -20,11 +20,10 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import java.util.Calendar;
-import java.util.List;
-import java.util.TimeZone;
 
-public class AssessmentList extends AppCompatActivity {
+import java.util.List;
+
+public class AssessmentListOld extends AppCompatActivity {
     private int EDITOR_REQUEST_CODE = 6661;
     private DBProvider provider;
     private Term thisTerm;
@@ -34,8 +33,6 @@ public class AssessmentList extends AppCompatActivity {
     ListView list;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_assessment_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -46,10 +43,9 @@ public class AssessmentList extends AppCompatActivity {
         if((savedInstanceState != null)) {
             termTitle = (String) savedInstanceState.get("termTitle");
             id = (String) savedInstanceState.get("courseTitle");
-            Toast.makeText(this, "savedState", Toast.LENGTH_LONG).show();
         }
         else if(bundle != null) {
-            Toast.makeText(this, "from bundle", Toast.LENGTH_LONG).show();
+
             termTitle = (String) bundle.getString("termTitle");
             id = (String) bundle.getString("courseTitle");
         }
@@ -58,13 +54,6 @@ public class AssessmentList extends AppCompatActivity {
             termTitle="";
             id="";
         }
-        TextView tvTerm = (TextView) findViewById(R.id.tvTerm1);
-        TextView tvCourse = (TextView) findViewById(R.id.tvCourse1);
-        tvCourse.setText(id);
-        Toast.makeText(this, "set tvCourse", Toast.LENGTH_LONG).show();
-        tvTerm.setText(termTitle);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         list = (ListView) findViewById(R.id.lvAssessments);
         provider = new DBProvider(this);
         provider.open();
@@ -76,7 +65,7 @@ public class AssessmentList extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(AssessmentList.this, AssessmentDetail.class);
+                Intent intent = new Intent(AssessmentListOld.this, AssessmentDetailOld.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("termTitle", thisTerm.getTermTitle());
                 bundle.putString("courseTitle", thisCourse.getCourseTitle());
@@ -88,9 +77,8 @@ public class AssessmentList extends AppCompatActivity {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(AssessmentList.this, AssessmentDetail.class);
+                Intent intent = new Intent(AssessmentListOld.this, AssessmentDetailOld.class);
                 Assessment assessment = (Assessment) parent.getAdapter().getItem(position);
-                System.out.println(">>>DEBUG:"+assessment.getCourse()+assessment.getType());
                 Bundle bundle = new Bundle();
                 bundle.putString("assessmentTitle", assessment.getCourse()+assessment.getType());
                 bundle.putString("courseTitle", thisCourse.getCourseTitle());
@@ -101,28 +89,47 @@ public class AssessmentList extends AppCompatActivity {
         });
 
     }
-    private void displayAssessments() {
-
-        DBProvider provider = new DBProvider(this);
-        provider.open();
-        List<Assessment> assessmentList = provider.getAssessments(thisCourse);
-        Toast.makeText(this, assessmentList.toString(), Toast.LENGTH_LONG).show();
-        ArrayAdapter<Assessment> assessmentListAdapter = new ArrayAdapter<>(this, R.layout.note_list_item, R.id.tvNote1, assessmentList);
-        list.setAdapter(assessmentListAdapter);
-        provider.close();
-    }
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         termTitle = (String) savedInstanceState.get("termTitle");
         id = (String) savedInstanceState.get("courseTitle");
-        Toast.makeText(this, "restore "+termTitle+id, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, termTitle+id, Toast.LENGTH_LONG).show();
     }
     @Override
     protected void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
-        bundle.putString("termTitle", termTitle);
-        bundle.putString("courseTitle", id);
-        Toast.makeText(this, "saved "+termTitle+id, Toast.LENGTH_LONG).show();
+        bundle.putString("termTitle", thisTerm.getTermTitle());
+        bundle.putString("courseTitle", thisCourse.getCourseTitle());
+        Toast.makeText(this, "term title/coursetitle"+thisTerm.getTermTitle()+thisCourse.getCourseTitle(), Toast.LENGTH_LONG).show();
+    }
+    private void displayAssessments() {
+
+        DBProvider provider = new DBProvider(this);
+        provider.open();
+        List<Assessment> assessmentList = provider.getAssessments(thisCourse);
+        ArrayAdapter<Assessment> courseListAdapter = new ArrayAdapter<>(this, R.layout.note_list_item, R.id.tvNote, assessmentList);
+        list.setAdapter(courseListAdapter);
+        provider.close();
+    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            onBackPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, CourseEditor.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("termTitle", thisTerm.getTermTitle());
+        bundle.putString("courseTitle", thisCourse.getCourseTitle());
+        intent.putExtras(bundle);
+        startActivityForResult(intent, EDITOR_REQUEST_CODE);
+
     }
 }

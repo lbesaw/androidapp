@@ -61,7 +61,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     //SQL for creating assessments table
     public static final String ASSESSMENTS_TABLE_CREATE =
             "CREATE TABLE " + TABLE_ASSESSMENTS + " (" +
-                    ASSESSMENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    ASSESSMENT_ID + " TEXT, " +
                     ASSESSMENT_COURSE + " TEXT, " +
                     ASSESSMENT_TYPE + " TEXT, " +
                     ASSESSMENT_TEXT_NOTES + " TEXT, " +
