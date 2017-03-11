@@ -34,6 +34,7 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
     private Course course = new Course();
     private Assessment thisAss = new Assessment();
     private Spinner spinner;
+    private String id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,16 +43,18 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
         setSupportActionBar(toolbar);
 
         spinner = (Spinner) findViewById(R.id.assSpinner);
+        TextView tvCourseName = (TextView) findViewById(R.id.tvCourseName);
         final TextView dueDate = (TextView) findViewById(R.id.dueDate);
         Bundle bundle = getIntent().getExtras();
         courseTitle = (String) bundle.get("courseTitle");
-        final String id = (String) bundle.get("assessmentTitle");
+        id = (String) bundle.get("assessmentTitle");
         termTitle = (String) bundle.get("termTitle");
         DBProvider provider = new DBProvider(this);
         provider.open();
         course = provider.getCourse(courseTitle);
         term = provider.getTerm(termTitle);
         provider.close();
+        tvCourseName.setText("Term: "+term.getTermTitle()+ " | Course: "+course.getCourseTitle());
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.ass_type, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -65,17 +68,15 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
             thisAss = provider.getAssessment(id);
             provider.close();
             if (thisAss.getType() != null) {
-                if (thisAss.getType().equals("Performance assessment"))
+                if (thisAss.getTypeNo() == 0)
                     spinner.setSelection(0);
-                if (thisAss.getType().equals("Objective assessment"))
+                if (thisAss.getTypeNo()== 1)
                     spinner.setSelection(1);
             }
             dueDate.setText(thisAss.getDateAsString());
         }
 
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(this);
-        dueDate.setOnClickListener(new View.OnClickListener() {
+                dueDate.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
@@ -153,9 +154,10 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
                 break;
             case Intent.ACTION_EDIT:
                 provider.open();
-                provider.update(thisAss.getCourse()+thisAss.getType(), thisAss);
-                setResult(RESULT_OK);
+                Toast.makeText(this, "EDIT>>>"+thisAss.getCourse()+thisAss.getType(), Toast.LENGTH_LONG).show();
+                provider.update(id, thisAss);
                 provider.close();
+                setResult(RESULT_OK);
                 break;
         }
         finish();

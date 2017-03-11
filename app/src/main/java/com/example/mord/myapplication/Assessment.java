@@ -21,7 +21,12 @@ public class Assessment {
     public String getType() {
         return type;
     }
-
+    public int getTypeNo() { if(this.type.equals("Objective assessment"))
+    return 1;
+    if(this.type.equals("Performance assessment"))
+    return 0;
+        else return -1;
+    }
     public void setType(String type) {
         this.type = type;
     }

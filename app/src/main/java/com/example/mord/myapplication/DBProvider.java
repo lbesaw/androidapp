@@ -93,7 +93,7 @@ public class DBProvider {
         values.put(DBOpenHelper.ASSESSMENT_DUE_YEAR, assessment.getYear());
         values.put(DBOpenHelper.ASSESSMENT_TYPE, assessment.getType());
         values.put(DBOpenHelper.ASSESSMENT_TEXT_NOTES, assessment.getNote());
-        database.update(DBOpenHelper.TABLE_ASSESSMENTS, values, DBOpenHelper.ASSESSMENT_ID +"=\""+oldAssessment+"\"", null);
+        database.update(DBOpenHelper.TABLE_ASSESSMENTS, values, DBOpenHelper.ASSESSMENT_ID +"='"+oldAssessment+"'", null);
     }
     public void update(String oldTerm, Term term) {
         ContentValues values = new ContentValues();
