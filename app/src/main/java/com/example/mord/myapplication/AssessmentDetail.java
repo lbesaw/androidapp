@@ -1,29 +1,22 @@
 package com.example.mord.myapplication;
 
 import android.app.DatePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Calendar;
 import java.util.TimeZone;
-
 public class AssessmentDetail extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private String type;
@@ -47,7 +40,7 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
         final TextView dueDate = (TextView) findViewById(R.id.dueDate);
         Bundle bundle = getIntent().getExtras();
         courseTitle = (String) bundle.get("courseTitle");
-        id = (String) bundle.get("assessmentTitle");
+        id = (String) bundle.get("assessmentId");
         termTitle = (String) bundle.get("termTitle");
         DBProvider provider = new DBProvider(this);
         provider.open();
@@ -73,6 +66,7 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
                 if (thisAss.getTypeNo()== 1)
                     spinner.setSelection(1);
             }
+            Toast.makeText(this, ">>>DEBUG - "+thisAss.getType()+thisAss.getCourse(), Toast.LENGTH_LONG).show();
             dueDate.setText(thisAss.getDateAsString());
         }
 
@@ -147,6 +141,7 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
         thisAss.setCourse(course.getCourseTitle());
         switch(action) {
             case Intent.ACTION_INSERT:
+                thisAss.setId(thisAss.getCourse()+System.currentTimeMillis());
                 provider.open();
                 provider.add(thisAss);
                 provider.close();
@@ -154,7 +149,6 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
                 break;
             case Intent.ACTION_EDIT:
                 provider.open();
-                Toast.makeText(this, "EDIT>>>"+thisAss.getCourse()+thisAss.getType(), Toast.LENGTH_LONG).show();
                 provider.update(id, thisAss);
                 provider.close();
                 setResult(RESULT_OK);
@@ -170,7 +164,7 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
         Bundle bundle = new Bundle();
         bundle.putString("termTitle", course.getTermTitle());
         bundle.putString("courseTitle", course.getCourseTitle());
-        bundle.putString("assessmentTitle", thisAss.getCourse()+thisAss.getType());
+        bundle.putString("assessmentId", thisAss.getId());
         intent.putExtras(bundle);
         startActivity(intent);
 

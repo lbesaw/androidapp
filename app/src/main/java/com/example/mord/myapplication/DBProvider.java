@@ -39,7 +39,6 @@ public class DBProvider {
     public void close() { dbhelper.close();}
 
     public void add(Assessment assessment) {
-        System.out.println("COURSEDEBUG>>> "+ assessment.getCourse());
     ContentValues values = new ContentValues();
         values.put(DBOpenHelper.ASSESSMENT_COURSE, assessment.getCourse());
         values.put(DBOpenHelper.ASSESSMENT_DUE_DAY, assessment.getDay());
@@ -47,7 +46,7 @@ public class DBProvider {
         values.put(DBOpenHelper.ASSESSMENT_DUE_YEAR, assessment.getYear());
         values.put(DBOpenHelper.ASSESSMENT_TYPE, assessment.getType());
         values.put(DBOpenHelper.ASSESSMENT_TEXT_NOTES, assessment.getNote());
-        values.put(DBOpenHelper.ASSESSMENT_ID, assessment.getCourse()+assessment.getType());
+        values.put(DBOpenHelper.ASSESSMENT_ID, assessment.getId());
         database.insert(DBOpenHelper.TABLE_ASSESSMENTS, null, values);
                     }
     public void add(Term term) {
@@ -135,6 +134,7 @@ public class DBProvider {
                 assessment.setYear(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_DUE_YEAR)));
                 assessment.setType(cursor.getString(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_TYPE)));
                 assessment.setNote(cursor.getString(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_TEXT_NOTES)));
+                assessment.setId(cursor.getString(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_ID)));
             }
         }
         return assessment;
@@ -232,7 +232,7 @@ public class DBProvider {
     }
     public List<Assessment> getAssessments(Course course) {
         List<Assessment> assessments = new ArrayList<>();
-        Cursor cursor = database.query(DBOpenHelper.TABLE_ASSESSMENTS, ASSESSMENTS_ALL_COLUMNS, null /*DBOpenHelper.ASSESSMENT_COURSE + " like '"+course.getCourseTitle()+"'"*/, null, null, null, null);
+        Cursor cursor = database.query(DBOpenHelper.TABLE_ASSESSMENTS, ASSESSMENTS_ALL_COLUMNS, DBOpenHelper.ASSESSMENT_COURSE + " like '"+course.getCourseTitle()+"'", null, null, null, null);
         if(cursor.getCount() > 0) {
             while(cursor.moveToNext()) {
                 Assessment assessment = new Assessment();
@@ -242,6 +242,7 @@ public class DBProvider {
                 assessment.setYear(cursor.getInt(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_DUE_YEAR)));
                 assessment.setType(cursor.getString(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_TYPE)));
                 assessment.setNote(cursor.getString(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_TEXT_NOTES)));
+                assessment.setId(cursor.getString(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_ID)));
                 assessments.add(assessment);
             }
         }

@@ -8,6 +8,7 @@ public class Assessment {
     private String type;
     private String note;
     private String course;
+    private String id;
     private int day, month, year;
 
     public void setDate(int day, int month, int year){
@@ -15,6 +16,12 @@ public class Assessment {
         this.year = year;
         this.month = month;
     }
+    public String getId() {
+        return id;
+            }
+            public void setId(String id) {
+                this.id = id;
+            }
     public String getDateAsString() {
         return month+"/"+day+"/"+year;
     }
@@ -76,6 +83,6 @@ public class Assessment {
         this.year = year;
     }
     public String toString() {
-        return type+" | Due: "+getDateAsString();
+        return type.split(" ")[0]+" | Due: "+getDateAsString();
     }
 }

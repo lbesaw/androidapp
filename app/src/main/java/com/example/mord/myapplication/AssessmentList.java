@@ -46,15 +46,12 @@ public class AssessmentList extends AppCompatActivity {
         if((savedInstanceState != null)) {
             termTitle = (String) savedInstanceState.get("termTitle");
             id = (String) savedInstanceState.get("courseTitle");
-            Toast.makeText(this, "savedState", Toast.LENGTH_LONG).show();
-        }
+                   }
         else if(bundle != null) {
-            Toast.makeText(this, "from bundle", Toast.LENGTH_LONG).show();
             termTitle = (String) bundle.getString("termTitle");
             id = (String) bundle.getString("courseTitle");
         }
         else {
-            Toast.makeText(this, "bundle is null", Toast.LENGTH_LONG).show();
             termTitle="";
             id="";
         }
@@ -90,9 +87,8 @@ public class AssessmentList extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(AssessmentList.this, AssessmentDetail.class);
                 Assessment assessment = (Assessment) parent.getAdapter().getItem(position);
-                System.out.println(">>>DEBUG:"+assessment.getCourse()+assessment.getType());
                 Bundle bundle = new Bundle();
-                bundle.putString("assessmentTitle", assessment.getCourse()+assessment.getType());
+                bundle.putString("assessmentId", assessment.getId());
                 bundle.putString("courseTitle", thisCourse.getCourseTitle());
                 bundle.putString("termTitle", thisTerm.getTermTitle());
                 intent.putExtras(bundle);
@@ -106,7 +102,6 @@ public class AssessmentList extends AppCompatActivity {
         DBProvider provider = new DBProvider(this);
         provider.open();
         List<Assessment> assessmentList = provider.getAssessments(thisCourse);
-        Toast.makeText(this, assessmentList.toString(), Toast.LENGTH_LONG).show();
         ArrayAdapter<Assessment> assessmentListAdapter = new ArrayAdapter<>(this, R.layout.note_list_item, R.id.tvNote1, assessmentList);
         list.setAdapter(assessmentListAdapter);
         provider.close();
@@ -116,13 +111,11 @@ public class AssessmentList extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         termTitle = (String) savedInstanceState.get("termTitle");
         id = (String) savedInstanceState.get("courseTitle");
-        Toast.makeText(this, "restore "+termTitle+id, Toast.LENGTH_LONG).show();
-    }
+        }
     @Override
     protected void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
         bundle.putString("termTitle", termTitle);
         bundle.putString("courseTitle", id);
-        Toast.makeText(this, "saved "+termTitle+id, Toast.LENGTH_LONG).show();
-    }
+        }
 }
