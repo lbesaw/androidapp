@@ -178,14 +178,14 @@ private Term thisTerm;
         assessmentsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finishedEditing();
+
                 Intent intent = new Intent(CourseEditor.this, AssessmentList.class);
                 Bundle bundle = new Bundle();
-                bundle.putString("termTitle", thisTerm.getTermTitle());
+                bundle.putString("termTitle", termTitle);
                 bundle.putString("courseTitle", thisCourse.getCourseTitle());
-
                 intent.putExtras(bundle);
-                startActivityForResult(intent, EDITOR_REQUEST_CODE);
+                startActivity(intent);
+                finishedEditing();
             }
         });
         tvMentorName.setOnClickListener(new View.OnClickListener() {

@@ -167,9 +167,9 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
         finishedEditing();
         Intent intent = new Intent(AssessmentDetail.this, AssessmentList.class);
         Bundle bundle = new Bundle();
-        bundle.putString("termTitle", course.getTermTitle());
+        bundle.putString("termTitle", termTitle);
         bundle.putString("courseTitle", course.getCourseTitle());
-        bundle.putString("assessmentId", thisAss.getId());
+        bundle.putString("assessmentId", id);
         intent.putExtras(bundle);
         startActivity(intent);
 

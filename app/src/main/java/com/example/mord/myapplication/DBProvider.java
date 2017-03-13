@@ -248,4 +248,20 @@ public class DBProvider {
         }
         return assessments;
     }
+    public void delete(Assessment assessment) {
+        database.delete(DBOpenHelper.TABLE_ASSESSMENTS, DBOpenHelper.ASSESSMENT_ID+"='"+assessment.getId()+"'", null);
+    }
+    public void delete(Term term) {
+        database.delete(DBOpenHelper.TABLE_TERMS, DBOpenHelper.TERM_TITLE+"='"+term.getTermTitle()+"'", null);
+    }
+    public void delete(Course course) {
+        database.delete(DBOpenHelper.TABLE_COURSES, DBOpenHelper.COURSE_TITLE+"='"+course.getCourseTitle()+"'", null);
+    }
+
+    public boolean isTermEmpty(Term term) {
+        if(getCourses(term).isEmpty()) {
+            return true;
+        }
+        else return false;
+    }
 }

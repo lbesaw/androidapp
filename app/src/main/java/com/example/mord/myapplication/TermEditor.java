@@ -3,8 +3,13 @@ package com.example.mord.myapplication;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -31,6 +36,8 @@ public class TermEditor extends AppCompatActivity {
     String termTitle;
     Term thisTerm = new Term();
     String term;
+    String id;
+    Boolean isSwipe = false;
     public void setTermTitle(String termTitle) {
         this.termTitle = termTitle;
     }
@@ -43,7 +50,6 @@ public class TermEditor extends AppCompatActivity {
         setContentView(R.layout.activity_term_editor);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final TextView startDateEditText = (TextView) findViewById(R.id.startDateEditText);
         final TextView endDateEditText = (TextView) findViewById(R.id.endDateEditText);
@@ -52,7 +58,7 @@ public class TermEditor extends AppCompatActivity {
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        final String id = (String) bundle.get("termTitle");
+       id = (String) bundle.get("termTitle");
 
 
 
@@ -125,27 +131,78 @@ public class TermEditor extends AppCompatActivity {
 
             }
         });
-        Button submitButton = (Button) findViewById(R.id.submitButton);
-        submitButton.setOnClickListener(new View.OnClickListener() {
+        displayCourses();
+        list.setOnTouchListener(new View.OnTouchListener() {
+            private int action_down_x = 0;
+            private int action_up_x = 0;
+            private int difference = 0;
             @Override
-            public void onClick(View view) {
-                finishedEditing();
+            public boolean onTouch(View v, MotionEvent event) {
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        action_down_x = (int) event.getX();
+                        isSwipe=false;  //until now
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        if(!isSwipe)
+                        {
+                            action_up_x = (int) event.getX();
+                            difference = action_down_x - action_up_x;
+                            if(Math.abs(difference)>50)
+                            {
+                                Log.d("action","action down x: "+action_down_x);
+                                Log.d("action","action up x: "+action_up_x);
+                                Log.d("action","difference: "+difference);
+                                //swipe left or right
+                                if(difference>0){
+                                    //swipe left
+
+                                }
+                                else{
+                                    //swipe right
+                                    Log.d("action","swipe right");
+                                }
+                                isSwipe=true;
+                            }
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        Log.d("action", "ACTION_UP - ");
+                        action_down_x = 0;
+                        action_up_x = 0;
+                        difference = 0;
+                        break;
+                }
+                return false;   //to allow the clicklistener to work after
             }
         });
-        displayCourses();
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(TermEditor.this, CourseEditor.class);
-                Course course = (Course) parent.getAdapter().getItem(position);
-                Bundle bundle = new Bundle();
-                bundle.putString("termTitle", termInputName.getText().toString().trim());
-                bundle.putString("courseTitle", course.getCourseTitle());
-                intent.putExtras(bundle);
+                if(isSwipe) {
+
+                    DBProvider provider = new DBProvider(TermEditor.this);
+                    provider.open();
+                    String courseName = ((Course) parent.getAdapter().getItem(position)).getCourseTitle();
+                    provider.delete((Course) parent.getAdapter().getItem(position));
+                    provider.close();
+                    Toast.makeText(TermEditor.this, "Course: "+courseName+" has been deleted!", Toast.LENGTH_SHORT).show();
+                    displayCourses();
+                }
+                else {
+                    Intent intent = new Intent(TermEditor.this, CourseEditor.class);
+                    Course course = (Course) parent.getAdapter().getItem(position);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("termTitle", termInputName.getText().toString().trim());
+                    bundle.putString("courseTitle", course.getCourseTitle());
+                    intent.putExtras(bundle);
 //                intent.putExtra(DBProvider.CONTENT_ITEM_TYPE, term.getTermTitle());
-                startActivityForResult(intent, EDITOR_REQUEST_CODE);
+                    startActivityForResult(intent, EDITOR_REQUEST_CODE);
+                }
             }
         });
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void finishedEditing() {
@@ -155,11 +212,10 @@ public class TermEditor extends AppCompatActivity {
         insertTerm(termInputName.getText().toString());
                 break;
             case Intent.ACTION_EDIT:
+                thisTerm.setTermTitle(termInputName.getText().toString());
                 DBProvider provider = new DBProvider(this);
                 provider.open();
-                term=thisTerm.getTermTitle();
-                thisTerm.setTermTitle(termInputName.getText().toString());
-                provider.update(term, thisTerm);
+                provider.update(id, thisTerm);
                 setResult(RESULT_OK);
                 provider.close();
                 break;
@@ -189,6 +245,7 @@ public class TermEditor extends AppCompatActivity {
 //    }
 
     public void launchCourseEditor(View view) {
+        finishedEditing();
         final EditText termInputName = (EditText) findViewById(R.id.termInputName);
         setTermTitle(termInputName.getText().toString());
         Intent intent = new Intent(this, CourseEditor.class);
@@ -199,10 +256,30 @@ public class TermEditor extends AppCompatActivity {
     }
 
     @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            onBackPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+    @Override
     public void onBackPressed() {
         finishedEditing();
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home){
+            finishedEditing();
+            NavUtils.navigateUpFromSameTask(this);
+        return true;
+    }
+    return super.onOptionsItemSelected(item);
+}
     private void displayCourses() {
 
         DBProvider provider = new DBProvider(this);
