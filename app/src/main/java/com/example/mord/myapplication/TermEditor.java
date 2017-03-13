@@ -176,7 +176,7 @@ public class TermEditor extends AppCompatActivity {
         provider.add(thisTerm);
         provider.close();
         setResult(RESULT_OK);
-        Toast.makeText(this, "RESULTS POSTED", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Term: "+termTitle+" created!", Toast.LENGTH_SHORT).show();
     }
 
 /// TO IMPLEMENT DELETE TERM

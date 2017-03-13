@@ -58,7 +58,6 @@ public class AssessmentList extends AppCompatActivity {
         TextView tvTerm = (TextView) findViewById(R.id.tvTerm1);
         TextView tvCourse = (TextView) findViewById(R.id.tvCourse1);
         tvCourse.setText(id);
-        Toast.makeText(this, "set tvCourse", Toast.LENGTH_LONG).show();
         tvTerm.setText(termTitle);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -118,4 +117,24 @@ public class AssessmentList extends AppCompatActivity {
         bundle.putString("termTitle", termTitle);
         bundle.putString("courseTitle", id);
         }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            onBackPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(AssessmentList.this, CourseEditor.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("termTitle", termTitle);
+        bundle.putString("courseTitle", id);
+        intent.putExtras(bundle);
+        startActivity(intent);
+
+    }
 }

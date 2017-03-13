@@ -52,8 +52,18 @@
         <activity
             android:name=".Notes"
             android:label="@string/title_activity_notes"
-            android:theme="@style/AppTheme.NoActionBar" />
-
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.mord.myapplication.CourseEditor" />
+        </activity>
+        <activity android:name=".AssessmentNotes"
+            android:label="Assessment Notes"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.mord.myapplication.AssessmentDetail" />
+        </activity>
 
         <activity
             android:name=".AssessmentList"

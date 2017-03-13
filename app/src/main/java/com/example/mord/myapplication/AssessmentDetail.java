@@ -66,7 +66,6 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
                 if (thisAss.getTypeNo()== 1)
                     spinner.setSelection(1);
             }
-            Toast.makeText(this, ">>>DEBUG - "+thisAss.getType()+thisAss.getCourse(), Toast.LENGTH_LONG).show();
             dueDate.setText(thisAss.getDateAsString());
         }
 
@@ -101,7 +100,13 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(AssessmentDetail.this, AssessmentNotes.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("termTitle", course.getTermTitle());
+                bundle.putString("courseTitle", course.getCourseTitle());
+                bundle.putString("assessmentId", thisAss.getId());
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 1);
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
