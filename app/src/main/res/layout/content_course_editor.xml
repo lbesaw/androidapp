@@ -39,29 +39,29 @@
         android:text="Start date:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/courseEditorCourseName"
+        android:id="@+id/textView7"
+        android:layout_alignBottom="@+id/ivStartAlarm"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/textView7" />
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:text="Click here to set date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/courseEditorCourseName"
+        android:id="@+id/tvStartDate"
+        android:layout_alignBottom="@+id/ivStartAlarm"
         android:layout_alignLeft="@+id/courseEditorCourseName"
-        android:layout_alignStart="@+id/courseEditorCourseName"
-        android:id="@+id/tvStartDate" />
+        android:layout_alignStart="@+id/courseEditorCourseName" />
 
     <TextView
         android:text="End date:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:id="@+id/textView11"
         android:layout_below="@+id/textView7"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="12dp"
-        android:id="@+id/textView11" />
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:text="Click here to set date"
@@ -161,4 +161,40 @@
         android:onClick="viewAssessments()"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
+
+    <ImageView
+        android:id="@+id/ivStartAlarm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/alarm"
+        android:layout_below="@+id/courseEditorCourseName"
+        android:layout_alignRight="@+id/mentorName"
+        android:layout_alignEnd="@+id/mentorName" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/alarm"
+        android:layout_above="@+id/assessmentsButton"
+        android:layout_alignLeft="@+id/ivStartAlarm"
+        android:layout_alignStart="@+id/ivStartAlarm" />
+
+    <CheckBox
+        android:id="@+id/cbStartAlarm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/ivStartAlarm"
+        android:layout_toRightOf="@+id/ivStartAlarm"
+        android:layout_below="@+id/courseEditorCourseName" />
+
+    <CheckBox
+        android:id="@+id/cbEndAlarm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/assessmentsButton"
+        android:layout_alignEnd="@+id/cbStartAlarm"
+        android:layout_alignRight="@+id/cbStartAlarm"
+        android:layout_alignTop="@+id/imageView2"
+        android:layout_toRightOf="@+id/imageView2" />
 </RelativeLayout>

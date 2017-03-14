@@ -1,9 +1,20 @@
 package com.example.mord.myapplication;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,13 +25,17 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
 
 public class CourseEditor extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -44,6 +59,8 @@ private Term thisTerm;
         Bundle bundle = getIntent().getExtras();
         final String termTitle = (String) bundle.get("termTitle");
         final String id = (String) bundle.get("courseTitle");
+        SharedPreferences prefs = getApplicationContext().getSharedPreferences("MyPref", 0);
+        final SharedPreferences.Editor editor = prefs.edit();
         final TextView tvStartDate = (TextView) findViewById(R.id.tvStartDate);
         final TextView tvEndDate = (TextView) findViewById(R.id.tvEndDate);
         final EditText courseName = (EditText) findViewById(R.id.courseEditorCourseName);
@@ -52,6 +69,8 @@ private Term thisTerm;
         final TextView tvMentoremail = (TextView) findViewById(R.id.mentorEmail);
         final TextView tvMentorphone = (TextView) findViewById(R.id.mentorPhone);
         final Spinner spinner = (Spinner) findViewById(R.id.statusSpinner);
+        final CheckBox cbStartAlarm = (CheckBox) findViewById(R.id.cbStartAlarm);
+        final CheckBox cbEndAlarm = (CheckBox) findViewById(R.id.cbEndAlarm);
         final Button assessmentsButton = (Button) findViewById(R.id.assessmentsButton);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.status_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -65,7 +84,17 @@ private Term thisTerm;
             provider.open();
             action = Intent.ACTION_EDIT;
             thisCourse = provider.getCourse(id);
+            boolean hasStartAlarm = prefs.getBoolean(thisCourse.getCourseTitle()+"startAlarm", false);
+            boolean hasEndAlarm = prefs.getBoolean(thisCourse.getCourseTitle()+"endAlarm", false);
             Mentor mentor;
+            if(hasStartAlarm) {
+                cbStartAlarm.setEnabled(false);
+                cbStartAlarm.setChecked(true);
+            }
+            if(hasEndAlarm) {
+                cbEndAlarm.setEnabled(false);
+                cbEndAlarm.setChecked(true);
+            }
             if(thisCourse.getCourseStatus()!=null) {
                 if(thisCourse.getCourseStatus().equals("In progress")) {
                     spinner.setSelection(0);
@@ -195,10 +224,88 @@ private Term thisTerm;
             }
         });
 
-
+       // ImageView cbStartAlarm = (ImageView) findViewById(R.id.ivStartAlarm);
+        cbStartAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!tvStartDate.getText().toString().equals("0/0/0") && !tvStartDate.getText().toString().equals("Click here to set date") && cbStartAlarm.isEnabled()) {
+                try {
+                        SetAlarm(tvStartDate.getText().toString(), courseName.getText().toString(), "start");
+                        Toast.makeText(CourseEditor.this, "Notification scheduled for " + courseName.getText().toString(), Toast.LENGTH_SHORT).show();
+                        cbStartAlarm.setEnabled(false);
+                        editor.putBoolean(courseName.getText().toString()+"startAlarm", true);
+                    editor.commit();
+                    }
+                catch(Exception e){
+                        System.out.println("FAIL");
+                        e.printStackTrace();
+                    }
+                }
+                else if(tvStartDate.getText().toString().equals("0/0/0") || tvStartDate.getText().toString().equals("Click here to set date")) {
+                    Toast.makeText(CourseEditor.this, "You must choose a valid date before setting an alarm", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        cbEndAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!tvEndDate.getText().toString().equals("0/0/0") && !tvEndDate.getText().toString().equals("Click here to set date") && cbEndAlarm.isEnabled()) {
+                    try {
+                        SetAlarm(tvEndDate.getText().toString(), courseName.getText().toString(), "end");
+                        Toast.makeText(CourseEditor.this, "Notification scheduled for " + courseName.getText().toString(), Toast.LENGTH_SHORT).show();
+                        cbEndAlarm.setEnabled(false);
+                        editor.putBoolean(courseName.getText().toString()+"endAlarm", true);
+                        editor.commit();
+                    }
+                    catch(Exception e){
+                        System.out.println("FAIL");
+                        e.printStackTrace();
+                    }
+                }
+                else if(tvEndDate.getText().toString().equals("0/0/0") || tvEndDate.getText().toString().equals("Click here to set date")) {
+                    Toast.makeText(CourseEditor.this, "You must choose a valid date before setting an alarm", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
     }
 
+    public void SetAlarm(String date, final String courseName, final String startOrEnd) throws Exception
+    {
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override public void onReceive(Context context, Intent intent )
+            {
+
+                NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(5, getNotification("Course: "+courseName+" is scheduled to "+startOrEnd+" today!"));
+
+                context.unregisterReceiver( this );
+            }
+        };
+
+        this.registerReceiver( receiver, new IntentFilter("com.example.mord.myapplication") );
+
+        PendingIntent pintent = PendingIntent.getBroadcast( this, 0, new Intent("com.example.mord.myapplication"), 0 );
+        AlarmManager manager = (AlarmManager)(this.getSystemService( Context.ALARM_SERVICE ));
+        date = date+" 10:00:00 PST";
+        SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss zzz");
+        Date tempDate = df.parse(date);
+        long epoch = tempDate.getTime();
+
+        System.out.println("DEBUG>>> EPOCH LENGTH BETWEEN NOW AND DATE " +(epoch-System.currentTimeMillis()));
+        manager.set( AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+(epoch - System.currentTimeMillis()), pintent);
+    }
+
+    private Notification getNotification(String content) {
+        Notification.Builder builder = new Notification.Builder(this);
+        builder.setContentTitle("WGU Course update");
+        builder.setContentText(content);
+        builder.setSmallIcon(R.drawable.ic_launcher);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            return builder.build();
+        }
+        else return null;
+    }
 
         @Override
         public void onItemSelected (AdapterView < ? > adapterView, View view,int i, long l){

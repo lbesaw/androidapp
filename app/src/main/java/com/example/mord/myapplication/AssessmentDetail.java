@@ -1,8 +1,18 @@
 package com.example.mord.myapplication;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -11,11 +21,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
 public class AssessmentDetail extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -37,7 +51,10 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
 
         spinner = (Spinner) findViewById(R.id.assSpinner);
         TextView tvCourseName = (TextView) findViewById(R.id.tvCourseName);
+        final CheckBox cbAssAlarm = (CheckBox) findViewById(R.id.cbAssAlarm);
         final TextView dueDate = (TextView) findViewById(R.id.dueDate);
+        SharedPreferences prefs = getApplicationContext().getSharedPreferences("MyPref", 0);
+        final SharedPreferences.Editor editor = prefs.edit();
         Bundle bundle = getIntent().getExtras();
         courseTitle = (String) bundle.get("courseTitle");
         id = (String) bundle.get("assessmentId");
@@ -52,6 +69,7 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
+        boolean hasAssAlarm = prefs.getBoolean(courseTitle+"assAlarm", false);
         if (id == null)
             action = Intent.ACTION_INSERT;
         else {
@@ -65,6 +83,10 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
                     spinner.setSelection(0);
                 if (thisAss.getTypeNo()== 1)
                     spinner.setSelection(1);
+            }
+            if(hasAssAlarm) {
+                cbAssAlarm.setEnabled(false);
+                cbAssAlarm.setChecked(true);
             }
             dueDate.setText(thisAss.getDateAsString());
         }
@@ -110,7 +132,68 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        cbAssAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!dueDate.getText().toString().equals("0/0/0") && !dueDate.getText().toString().equals("Click here to set date") && cbAssAlarm.isEnabled()) {
+                    try {
+                        SetAlarm(dueDate.getText().toString(), course.getCourseTitle());
+                        Toast.makeText(AssessmentDetail.this, "Assessment notification scheduled for " + course, Toast.LENGTH_SHORT).show();
+                        cbAssAlarm.setEnabled(false);
+                        editor.putBoolean(courseTitle+"assAlarm", true);
+                        editor.commit();
+                    }
+                    catch(Exception e){
+                        System.out.println("FAIL");
+                        e.printStackTrace();
+                    }
+                }
+                else if(dueDate.getText().toString().equals("0/0/0") || dueDate.getText().toString().equals("Click here to set date")) {
+                    Toast.makeText(AssessmentDetail.this, "You must choose a valid date before setting an alarm", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
+
+    public void SetAlarm(String date, final String courseName) throws Exception
+    {
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override public void onReceive(Context context, Intent intent )
+            {
+
+                NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(10, getNotification("Assessment for "+courseName+" is scheduled for today!"));
+
+                context.unregisterReceiver( this );
+            }
+        };
+
+        this.registerReceiver( receiver, new IntentFilter("com.example.mord.myapplication") );
+
+        PendingIntent pintent = PendingIntent.getBroadcast( this, 0, new Intent("com.example.mord.myapplication"), 0 );
+        AlarmManager manager = (AlarmManager)(this.getSystemService( Context.ALARM_SERVICE ));
+        date = date+" 10:00:00 PST";
+        SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss zzz");
+        Date tempDate = df.parse(date);
+        long epoch = tempDate.getTime();
+
+        System.out.println("DEBUG>>> EPOCH LENGTH BETWEEN NOW AND DATE " +(epoch-System.currentTimeMillis()));
+        manager.set( AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+(epoch - System.currentTimeMillis()), pintent);
+    }
+
+    private Notification getNotification(String content) {
+        Notification.Builder builder = new Notification.Builder(this);
+        builder.setContentTitle("WGU assessment update");
+        builder.setContentText(content);
+        builder.setSmallIcon(R.drawable.ic_launcher);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            return builder.build();
+        }
+        else return null;
+    }
+
     @Override
     public void onItemSelected (AdapterView < ? > adapterView, View view,int i, long l){
         type = adapterView.getItemAtPosition(i).toString();
