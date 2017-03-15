@@ -14,19 +14,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
-        android:layout_alignTop="@+id/assessmentButton"
-        android:id="@+id/mainList"/>
+                android:id="@+id/mainList"/>
 
     <at.markushi.ui.CircleButton
         android:layout_width="64dp"
         android:layout_height="64dp"
-        app:cb_color="@color/colorPrimary"
+        app:cb_color="@color/colorAccent"
         app:cb_pressedRingWidth="8dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:onClick="openTermEditor"
-        android:src="@drawable/ic_launcher"
+        android:src="@android:drawable/ic_menu_add"
         android:id="@+id/circleButton" />
 
     <TextView

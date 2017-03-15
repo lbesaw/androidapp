@@ -14,13 +14,15 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -28,7 +30,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -372,6 +373,7 @@ private Term thisTerm;
         thisCourse.setTermTitle(thisTerm.getTermTitle());
         switch(action) {
             case Intent.ACTION_INSERT:
+                if(courseName.getText().toString() != null && !courseName.getText().toString().trim().equals(""))
                 insertCourse(courseName.getText().toString().trim());
                 break;
             case Intent.ACTION_EDIT:
@@ -419,4 +421,57 @@ private Term thisTerm;
         startActivityForResult(intent, EDITOR_REQUEST_CODE);
 
     }
+    private void deleteWarn() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Delete note?");
+        builder.setMessage("Are you sure you want to delete this note?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                CourseEditor.this.deleteIt();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void deleteIt() {
+        DBProvider provider = new DBProvider(this);
+        provider.open();
+        Toast.makeText(this, "Course deleted", Toast.LENGTH_LONG).show();
+        provider.delete(thisCourse);
+        setResult(RESULT_OK);
+        provider.close();
+        Intent intent = new Intent(this, TermEditor.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("termTitle", thisTerm.getTermTitle());
+        bundle.putString("courseTitle", thisCourse.getCourseTitle());
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            case R.id.menu_item_delete:
+                deleteWarn();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_course_editor, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
 }

@@ -33,7 +33,7 @@
         <activity android:name=".CourseDetail" />
         <activity
             android:name=".TermEditor"
-            android:label="@string/title_activity_term_editor"
+            android:label="Term Detail"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -42,7 +42,7 @@
         </activity>
         <activity
             android:name=".CourseEditor"
-            android:label="@string/title_activity_course_editor"
+            android:label="Course Detail"
             android:parentActivityName=".TermEditor"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

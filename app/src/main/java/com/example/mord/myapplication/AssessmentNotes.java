@@ -65,10 +65,13 @@ public class AssessmentNotes extends AppCompatActivity {
             case R.id.menu_item_share:
                 shareIt();
                 break;
+            case R.id.menu_item_delete:
+                deleteWarn();
+                break;
         }
+
         return super.onOptionsItemSelected(item);
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,7 +145,7 @@ public class AssessmentNotes extends AppCompatActivity {
     }
     public void shareIt() {
         final String extStorageDirectory = Environment.getExternalStorageDirectory().toString()+"/wgunote";
-        final File file = new File(extStorageDirectory+"/", filename+".png");
+        final File file = new File(extStorageDirectory+"/", filename+".jpg");
         final TextView tvNote = (TextView) findViewById(R.id.tvAssessmentNote);
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         sharingIntent.setType("image/jpeg");
@@ -153,6 +156,40 @@ public class AssessmentNotes extends AppCompatActivity {
         startActivity(Intent.createChooser(sharingIntent, "Share via"));
     }
 
+    private void deleteWarn() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Delete note?");
+        builder.setMessage("Are you sure you want to delete this note?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                AssessmentNotes.this.deleteIt();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void deleteIt() {
+        final String extStorageDirectory = Environment.getExternalStorageDirectory().toString()+"/wgunote";
+        final File file = new File(extStorageDirectory+"/", filename+".jpg");
+
+        ImageView a = (ImageView) findViewById(R.id.ivAssessmentNote);
+        TextView etNote = (TextView) findViewById(R.id.tvAssessmentNote);
+            boolean deleted = file.delete();
+            Log.e("File delete check", "file:"+file.toString()+" deleted: " +deleted);
+
+            a.setImageBitmap(null);
+        etNote.setText("Click here to enter notes");
+        Toast.makeText(this, "Assessment note deleted", Toast.LENGTH_LONG).show();
+        thisAss.setNote(null);
+        onBackPressed();
+    }
     private File savebitmap(Bitmap bmp) {
         String extStorageDirectory = Environment.getExternalStorageDirectory().toString()+"/wgunote";
         File dir = new File(extStorageDirectory);

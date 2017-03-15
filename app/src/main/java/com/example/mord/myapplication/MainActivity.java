@@ -1,29 +1,18 @@
 package com.example.mord.myapplication;
 
-import android.app.AlertDialog;
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -35,50 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Term> termList;
     private ListView list;
     private Boolean isSwipe = false;
-//    private TermsCursorAdapter termListAdapter;
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.action_create_sample:
-                displayTerms();
-                break;
-            case R.id.action_delete_all:
-                deleteAllNotes();
-                break;
-
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void deleteAllNotes() {
-        DialogInterface.OnClickListener dialogClickListener =
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int button) {
-                        if (button == DialogInterface.BUTTON_POSITIVE) {
-
-                            Toast.makeText(MainActivity.this,
-                                    getString(R.string.all_deleted),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.are_you_sure))
-                .setPositiveButton(getString(android.R.string.yes), dialogClickListener)
-                .setNegativeButton(getString(android.R.string.no), dialogClickListener)
-                .show();
-
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
                         provider.delete((Term) parent.getAdapter().getItem(position));
                         provider.close();
-                        Toast.makeText(MainActivity.this, "Course: " + termName + " has been deleted!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Term: " + termName + " has been deleted!", Toast.LENGTH_SHORT).show();
                         displayTerms();
                     }
                     else {

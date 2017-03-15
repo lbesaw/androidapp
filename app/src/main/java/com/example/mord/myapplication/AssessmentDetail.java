@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -14,15 +15,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -122,10 +127,11 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                finishedEditing();
                 Intent intent = new Intent(AssessmentDetail.this, AssessmentNotes.class);
                 Bundle bundle = new Bundle();
-                bundle.putString("termTitle", course.getTermTitle());
-                bundle.putString("courseTitle", course.getCourseTitle());
+                bundle.putString("termTitle", termTitle);
+                bundle.putString("courseTitle", courseTitle);
                 bundle.putString("assessmentId", thisAss.getId());
                 intent.putExtras(bundle);
                 startActivityForResult(intent, 1);
@@ -194,6 +200,49 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
         else return null;
     }
 
+
+    private void deleteWarn() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Delete note?");
+        builder.setMessage("Are you sure you want to delete this note?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                AssessmentDetail.this.deleteIt();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void deleteIt() {
+        DBProvider provider = new DBProvider(this);
+        provider.open();
+        Toast.makeText(this, "Assessment deleted", Toast.LENGTH_LONG).show();
+        provider.delete(thisAss);
+        setResult(RESULT_OK);
+        provider.close();
+        Intent intent = new Intent(this, CourseEditor.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("termTitle", termTitle);
+        bundle.putString("courseTitle", courseTitle);
+        bundle.putString("assessmentId", id);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_ass_detail, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
     @Override
     public void onItemSelected (AdapterView < ? > adapterView, View view,int i, long l){
         type = adapterView.getItemAtPosition(i).toString();
@@ -202,9 +251,14 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            case R.id.menu_item_delete:
+                deleteWarn();
+                break;
         }
         return super.onOptionsItemSelected(item);
 }
@@ -242,7 +296,7 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
                 setResult(RESULT_OK);
                 break;
         }
-        finish();
+       // finish();
     }
 
     @Override
@@ -251,7 +305,7 @@ public class AssessmentDetail extends AppCompatActivity implements AdapterView.O
         Intent intent = new Intent(AssessmentDetail.this, AssessmentList.class);
         Bundle bundle = new Bundle();
         bundle.putString("termTitle", termTitle);
-        bundle.putString("courseTitle", course.getCourseTitle());
+        bundle.putString("courseTitle", courseTitle);
         bundle.putString("assessmentId", id);
         intent.putExtras(bundle);
         startActivity(intent);

@@ -1,13 +1,17 @@
 package com.example.mord.myapplication;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,7 +40,7 @@ public class TermEditor extends AppCompatActivity {
     String termTitle;
     Term thisTerm = new Term();
     String term;
-    String id;
+    String termId;
     Boolean isSwipe = false;
     public void setTermTitle(String termTitle) {
         this.termTitle = termTitle;
@@ -58,18 +62,18 @@ public class TermEditor extends AppCompatActivity {
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-       id = (String) bundle.get("termTitle");
+       termId = (String) bundle.get("termTitle");
 
 
 
-        if(id == null) {
+        if(termId == null) {
             action = Intent.ACTION_INSERT;
              }
         else {
             DBProvider provider = new DBProvider(this);
             provider.open();
             action = Intent.ACTION_EDIT;
-            thisTerm = provider.getTerm(id);
+            thisTerm = provider.getTerm(termId);
             termInputName.setText(thisTerm.getTermTitle());
             startDateEditText.setText(thisTerm.getStartMonth()+1+ "/"+thisTerm.getStartDay()+"/"+thisTerm.getStartYear());
             endDateEditText.setText(thisTerm.getEndMonth()+1+ "/"+thisTerm.getEndDay()+"/"+thisTerm.getEndYear());
@@ -209,13 +213,14 @@ public class TermEditor extends AppCompatActivity {
         final EditText termInputName = (EditText) findViewById(R.id.termInputName);
         switch(action) {
             case Intent.ACTION_INSERT:
+                if(termInputName.getText().toString() != null && !termInputName.getText().toString().trim().equals(""))
         insertTerm(termInputName.getText().toString());
                 break;
             case Intent.ACTION_EDIT:
                 thisTerm.setTermTitle(termInputName.getText().toString());
                 DBProvider provider = new DBProvider(this);
                 provider.open();
-                provider.update(id, thisTerm);
+                provider.update(termId, thisTerm);
                 setResult(RESULT_OK);
                 provider.close();
                 break;
@@ -234,15 +239,6 @@ public class TermEditor extends AppCompatActivity {
         setResult(RESULT_OK);
         Toast.makeText(this, "Term: "+termTitle+" created!", Toast.LENGTH_SHORT).show();
     }
-
-/// TO IMPLEMENT DELETE TERM
-//    private void deleteNote() {
-//        getContentResolver().delete(DBProvider.TERM_CONTENT_URI,
-//                noteFilter, null);
-//        Toast.makeText(this, "Note Deleted", Toast.LENGTH_SHORT).show();
-//        setResult(RESULT_OK);
-//        finish();
-//    }
 
     public void launchCourseEditor(View view) {
         finishedEditing();
@@ -271,15 +267,7 @@ public class TermEditor extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home){
-            finishedEditing();
-            NavUtils.navigateUpFromSameTask(this);
-        return true;
-    }
-    return super.onOptionsItemSelected(item);
-}
+
     private void displayCourses() {
 
         DBProvider provider = new DBProvider(this);
@@ -288,6 +276,64 @@ public class TermEditor extends AppCompatActivity {
         courseListAdapter = new ArrayAdapter<>(this, R.layout.note_list_item, R.id.tvNote1, courseList);
         list.setAdapter(courseListAdapter);
         provider.close();
+    }
+    private void deleteWarn() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Delete term?");
+        builder.setMessage("Are you sure you want to delete this term?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                DBProvider provider = new DBProvider(TermEditor.this);
+                provider.open();
+                if(provider.isTermEmpty(thisTerm))
+                TermEditor.this.deleteIt();
+                else {
+                    Toast.makeText(TermEditor.this, "You may only delete terms containing no courses!", Toast.LENGTH_SHORT).show();
+                    dialog.cancel();
+                }
+            provider.close();
+            }
+
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void deleteIt() {
+        DBProvider provider = new DBProvider(this);
+        provider.open();
+        Toast.makeText(this, "Term deleted", Toast.LENGTH_LONG).show();
+        provider.delete(thisTerm);
+        setResult(RESULT_OK);
+        provider.close();
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home:
+                finishedEditing();
+                NavUtils.navigateUpFromSameTask(this);
+                break;
+            case R.id.menu_item_delete:
+                deleteWarn();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_term_editor, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
 

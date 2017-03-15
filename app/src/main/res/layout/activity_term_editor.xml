@@ -69,17 +69,18 @@
             android:layout_below="@+id/textView5"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
+
         <at.markushi.ui.CircleButton
             android:layout_width="64dp"
             android:layout_height="64dp"
-            app:cb_color="@color/colorPrimary"
-            app:cb_pressedRingWidth="8dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:onClick="launchCourseEditor"
-            android:src="@drawable/ic_launcher"
-            />
+            android:src="@android:drawable/ic_menu_add"
+            app:cb_color="@color/colorAccent"
+            app:cb_pressedRingWidth="8dp"
+             />
 
         <TextView
             android:text="Courses"
@@ -113,18 +114,17 @@
             android:layout_alignStart="@+id/startDateEditText" />
 
         <EditText
+            android:id="@+id/termInputName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:text="Name"
-            android:ems="10"
-            android:id="@+id/termInputName"
-            android:layout_weight="0.12"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/textView2"
-            android:layout_toEndOf="@+id/textView2"
             android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp" />
+            android:layout_marginStart="16dp"
+            android:layout_toEndOf="@+id/textView2"
+            android:layout_toRightOf="@+id/textView2"
+            android:layout_weight="0.12"
+            android:ems="10"
+            android:inputType="textPersonName" />
 
         <TextView
             android:text="Term Title: "

@@ -136,8 +136,9 @@ public class DBProvider {
                 assessment.setNote(cursor.getString(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_TEXT_NOTES)));
                 assessment.setId(cursor.getString(cursor.getColumnIndex(DBOpenHelper.ASSESSMENT_ID)));
             }
+            return assessment;
         }
-        return assessment;
+        else return null;
     }
     public Term getTerm(String termName) {
         Cursor cursor = database.query(DBOpenHelper.TABLE_TERMS, TERMS_ALL_COLUMNS, DBOpenHelper.TERM_TITLE + " = ?", new String[] {termName}, null, null, null);

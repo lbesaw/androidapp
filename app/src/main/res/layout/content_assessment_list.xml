@@ -13,41 +13,37 @@
     android:layout_width="30dp"
     android:layout_height="60dp"
     android:id="@+id/linearLayout3"
-    android:layout_marginLeft="162dp"
-    android:layout_marginStart="162dp"
-    android:layout_marginTop="154dp"
-    android:layout_alignParentTop="true"
+    android:layout_alignParentRight="true"
+    android:layout_alignParentEnd="true"
     android:layout_alignParentLeft="true"
-    android:layout_alignParentStart="true"></LinearLayout>
+    android:layout_alignParentStart="true"
+    android:gravity="center"
+>
 
-    <ListView
-        android:id="@+id/lvAssessments"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/linearLayout3"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="155dp" />
+    <TextView
+
+        android:id="@+id/tvCourse1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="TextView"
+        android:textAlignment="center"/>
 
     <TextView
         android:id="@+id/tvTerm1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="34dp"
-        android:layout_marginStart="34dp"
-        android:layout_marginTop="42dp"
-        android:text="TextView" />
+        android:layout_weight="1"
+        android:text="TextView"
+        android:textAlignment="center"/>
+</LinearLayout>
 
-    <TextView
-        android:id="@+id/tvCourse1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/tvTerm1"
-        android:layout_alignStart="@+id/tvTerm1"
-        android:layout_below="@+id/tvTerm1"
-        android:layout_marginTop="35dp"
-        android:text="TextView" />
+    <ListView
+        android:id="@+id/lvAssessments"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/linearLayout3" />
 
 </RelativeLayout>

@@ -75,7 +75,7 @@ public class AssessmentList extends AppCompatActivity {
         thisCourse = provider.getCourse(id);
         thisTerm = provider.getTerm(termTitle);
         provider.close();
-        displayAssessments();
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,7 +83,7 @@ public class AssessmentList extends AppCompatActivity {
                 Intent intent = new Intent(AssessmentList.this, AssessmentDetail.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("termTitle", termTitle);
-                bundle.putString("courseTitle", thisCourse.getCourseTitle());
+                bundle.putString("courseTitle", id);
                 intent.putExtras(bundle);
                 startActivityForResult(intent, EDITOR_REQUEST_CODE);
             }
@@ -153,14 +153,14 @@ public class AssessmentList extends AppCompatActivity {
                     Bundle bundle = new Bundle();
                     String assId = assessment.getId();
                     bundle.putString("assessmentId", assId);
-                    bundle.putString("courseTitle", thisCourse.getCourseTitle());
+                    bundle.putString("courseTitle", AssessmentList.this.id);
                     bundle.putString("termTitle", termTitle);
                     intent.putExtras(bundle);
                     startActivityForResult(intent, EDITOR_REQUEST_CODE);
                 }
             }
         });
-
+        displayAssessments();
     }
     private void displayAssessments() {
 
