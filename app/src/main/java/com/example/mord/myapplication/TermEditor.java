@@ -8,7 +8,6 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,14 +16,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -39,13 +36,12 @@ public class TermEditor extends AppCompatActivity {
     private int EDITOR_REQUEST_CODE = 6661;
     String termTitle;
     Term thisTerm = new Term();
-    String term;
     String termId;
     Boolean isSwipe = false;
+
     public void setTermTitle(String termTitle) {
         this.termTitle = termTitle;
     }
-
 
 
     @Override
@@ -62,24 +58,21 @@ public class TermEditor extends AppCompatActivity {
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-       termId = (String) bundle.get("termTitle");
-
-
-
-        if(termId == null) {
+        termId = (String) bundle.get("termTitle");
+        //code to set up the layout if this is an edited term
+        if (termId == null) {
             action = Intent.ACTION_INSERT;
-             }
-        else {
+        } else {
             DBProvider provider = new DBProvider(this);
             provider.open();
             action = Intent.ACTION_EDIT;
             thisTerm = provider.getTerm(termId);
             termInputName.setText(thisTerm.getTermTitle());
-            startDateEditText.setText(thisTerm.getStartMonth()+1+ "/"+thisTerm.getStartDay()+"/"+thisTerm.getStartYear());
-            endDateEditText.setText(thisTerm.getEndMonth()+1+ "/"+thisTerm.getEndDay()+"/"+thisTerm.getEndYear());
+            startDateEditText.setText(thisTerm.getStartMonth() + 1 + "/" + thisTerm.getStartDay() + "/" + thisTerm.getStartYear());
+            endDateEditText.setText(thisTerm.getEndMonth() + 1 + "/" + thisTerm.getEndDay() + "/" + thisTerm.getEndYear());
             provider.close();
         }
-
+        //calendar picker so user doesnt have to enter a date manually
         startDateEditText.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -90,12 +83,11 @@ public class TermEditor extends AppCompatActivity {
                     public void onDateSet(DatePicker view, int selectedYear,
                                           int selectedMonth, int selectedDay) {
                         startDateEditText.setText(selectedMonth + 1 + "/" + selectedDay + "/" + selectedYear);
-                        thisTerm.setStartDate(selectedDay, selectedMonth+1, selectedYear);
+                        thisTerm.setStartDate(selectedDay, selectedMonth + 1, selectedYear);
                     }
                 };
                 Calendar cal = Calendar.getInstance(TimeZone.getDefault()); // Get current date
 
-// Create the DatePickerDialog instance
                 DatePickerDialog datePicker = new DatePickerDialog(TermEditor.this,
                         R.style.AppTheme, datePickerListener,
                         cal.get(Calendar.YEAR),
@@ -104,7 +96,6 @@ public class TermEditor extends AppCompatActivity {
                 datePicker.setCancelable(false);
                 datePicker.setTitle("Select term start date");
                 datePicker.show();
-
             }
         });
 
@@ -118,12 +109,10 @@ public class TermEditor extends AppCompatActivity {
                     public void onDateSet(DatePicker view, int selectedYear,
                                           int selectedMonth, int selectedDay) {
                         endDateEditText.setText(selectedMonth + 1 + "/" + selectedDay + "/" + selectedYear);
-                        thisTerm.setEndDate(selectedDay, selectedMonth+1, selectedYear);
+                        thisTerm.setEndDate(selectedDay, selectedMonth + 1, selectedYear);
                     }
                 };
                 Calendar cal = Calendar.getInstance(TimeZone.getDefault()); // Get current date
-
-// Create the DatePickerDialog instance
                 DatePickerDialog datePicker = new DatePickerDialog(TermEditor.this,
                         R.style.AppTheme, datePickerListener,
                         cal.get(Calendar.YEAR),
@@ -136,72 +125,57 @@ public class TermEditor extends AppCompatActivity {
             }
         });
         displayCourses();
+        //code to detect a swipe, and if its a swipe, to remove the course from the term
         list.setOnTouchListener(new View.OnTouchListener() {
             private int action_down_x = 0;
             private int action_up_x = 0;
             private int difference = 0;
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         action_down_x = (int) event.getX();
-                        isSwipe=false;  //until now
+                        isSwipe = false;  //until now
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if(!isSwipe)
-                        {
+                        if (!isSwipe) {
                             action_up_x = (int) event.getX();
                             difference = action_down_x - action_up_x;
-                            if(Math.abs(difference)>50)
-                            {
-                                Log.d("action","action down x: "+action_down_x);
-                                Log.d("action","action up x: "+action_up_x);
-                                Log.d("action","difference: "+difference);
-                                //swipe left or right
-                                if(difference>0){
-                                    //swipe left
-
-                                }
-                                else{
-                                    //swipe right
-                                    Log.d("action","swipe right");
-                                }
-                                isSwipe=true;
+                            if (Math.abs(difference) > 50) {
+                                isSwipe = true;
                             }
                         }
                         break;
                     case MotionEvent.ACTION_UP:
-                        Log.d("action", "ACTION_UP - ");
                         action_down_x = 0;
                         action_up_x = 0;
                         difference = 0;
                         break;
                 }
-                return false;   //to allow the clicklistener to work after
+                return false;
             }
         });
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(isSwipe) {
+                if (isSwipe) {    //if its a swipe, delete the course!
 
                     DBProvider provider = new DBProvider(TermEditor.this);
                     provider.open();
                     String courseName = ((Course) parent.getAdapter().getItem(position)).getCourseTitle();
                     provider.delete((Course) parent.getAdapter().getItem(position));
                     provider.close();
-                    Toast.makeText(TermEditor.this, "Course: "+courseName+" has been deleted!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TermEditor.this, "Course: " + courseName + " has been deleted!", Toast.LENGTH_SHORT).show();
                     displayCourses();
-                }
-                else {
+                } else {
                     Intent intent = new Intent(TermEditor.this, CourseEditor.class);
                     Course course = (Course) parent.getAdapter().getItem(position);
                     Bundle bundle = new Bundle();
                     bundle.putString("termTitle", termInputName.getText().toString().trim());
                     bundle.putString("courseTitle", course.getCourseTitle());
                     intent.putExtras(bundle);
-//                intent.putExtra(DBProvider.CONTENT_ITEM_TYPE, term.getTermTitle());
                     startActivityForResult(intent, EDITOR_REQUEST_CODE);
                 }
             }
@@ -211,10 +185,10 @@ public class TermEditor extends AppCompatActivity {
 
     private void finishedEditing() {
         final EditText termInputName = (EditText) findViewById(R.id.termInputName);
-        switch(action) {
+        switch (action) {
             case Intent.ACTION_INSERT:
-                if(termInputName.getText().toString() != null && !termInputName.getText().toString().trim().equals(""))
-        insertTerm(termInputName.getText().toString());
+                if (termInputName.getText().toString() != null && !termInputName.getText().toString().trim().equals(""))
+                    insertTerm(termInputName.getText().toString());
                 break;
             case Intent.ACTION_EDIT:
                 thisTerm.setTermTitle(termInputName.getText().toString());
@@ -232,12 +206,11 @@ public class TermEditor extends AppCompatActivity {
     private void insertTerm(String termTitle) {
         DBProvider provider = new DBProvider(this);
         thisTerm.setTermTitle(termTitle);
-        TermHandler.addTerm(thisTerm);
         provider.open();
         provider.add(thisTerm);
         provider.close();
         setResult(RESULT_OK);
-        Toast.makeText(this, "Term: "+termTitle+" created!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Term: " + termTitle + " created!", Toast.LENGTH_SHORT).show();
     }
 
     public void launchCourseEditor(View view) {
@@ -253,7 +226,7 @@ public class TermEditor extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
                 && keyCode == KeyEvent.KEYCODE_BACK
                 && event.getRepeatCount() == 0) {
             onBackPressed();
@@ -261,6 +234,7 @@ public class TermEditor extends AppCompatActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
+
     @Override
     public void onBackPressed() {
         finishedEditing();
@@ -277,6 +251,7 @@ public class TermEditor extends AppCompatActivity {
         list.setAdapter(courseListAdapter);
         provider.close();
     }
+
     private void deleteWarn() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -286,13 +261,13 @@ public class TermEditor extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int id) {
                 DBProvider provider = new DBProvider(TermEditor.this);
                 provider.open();
-                if(provider.isTermEmpty(thisTerm))
-                TermEditor.this.deleteIt();
+                if (provider.isTermEmpty(thisTerm))
+                    TermEditor.this.deleteIt();
                 else {
                     Toast.makeText(TermEditor.this, "You may only delete terms containing no courses!", Toast.LENGTH_SHORT).show();
                     dialog.cancel();
                 }
-            provider.close();
+                provider.close();
             }
 
         });
@@ -315,6 +290,7 @@ public class TermEditor extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -329,13 +305,13 @@ public class TermEditor extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_term_editor, menu);
         return super.onCreateOptionsMenu(menu);
     }
-
 
 
 }

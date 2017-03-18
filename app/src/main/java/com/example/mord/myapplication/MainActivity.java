@@ -1,6 +1,5 @@
 package com.example.mord.myapplication;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,7 +18,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private static final int EDITOR_REQUEST_CODE = 666;
-    private DBProvider datasource;
+    private DBProvider provider;
     private ArrayAdapter<Term> termListAdapter;
     private List<Term> termList;
     private ListView list;
@@ -31,54 +30,52 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        datasource = new DBProvider(this);
-        datasource.open();
-
-
+        provider = new DBProvider(this);
+        provider.open();
 
         list = (ListView) findViewById(R.id.mainList);
         displayTerms();
-        if(datasource.getTerms().isEmpty()) {
+
+        if (provider.getTerms().isEmpty()) {
             TextView tv = (TextView) findViewById(R.id.tvMain);
-            tv.setText("Welcome!  Please get started by clicking the floating plus button"+
-            " at the bottom of the screen to add a term!");
-        }
-        else {
+            tv.setText("Welcome!  Please get started by clicking the floating plus button" +
+                    " at the bottom of the screen to add a term!");
+        } else {
             TextView tv = (TextView) findViewById(R.id.tvMain);
             tv.setText("Welcome back!");
         }
+        provider.close();
+        //Code to allow user to detect a swipe and then swipe terms away to delete them
         list.setOnTouchListener(new View.OnTouchListener() {
             private int action_down_x = 0;
             private int action_up_x = 0;
             private int difference = 0;
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         action_down_x = (int) event.getX();
-                        isSwipe=false;  //until now
+                        isSwipe = false;  //until now
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if(!isSwipe)
-                        {
+                        if (!isSwipe) {
                             action_up_x = (int) event.getX();
                             difference = action_down_x - action_up_x;
-                            if(Math.abs(difference)>50)
-                            {
-                                Log.d("action","action down x: "+action_down_x);
-                                Log.d("action","action up x: "+action_up_x);
-                                Log.d("action","difference: "+difference);
+                            if (Math.abs(difference) > 50) {
+                                Log.d("action", "action down x: " + action_down_x);
+                                Log.d("action", "action up x: " + action_up_x);
+                                Log.d("action", "difference: " + difference);
                                 //swipe left or right
-                                if(difference>0){
+                                if (difference > 0) {
                                     //swipe left
 
-                                }
-                                else{
+                                } else {
                                     //swipe right
-                                    Log.d("action","swipe right");
+                                    Log.d("action", "swipe right");
                                 }
-                                isSwipe=true;
+                                isSwipe = true;
                             }
                         }
                         break;
@@ -89,28 +86,26 @@ public class MainActivity extends AppCompatActivity {
                         difference = 0;
                         break;
                 }
-                return false;   //to allow the clicklistener to work after
+                return false;
             }
         });
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(isSwipe) {
+                if (isSwipe) {
                     DBProvider provider = new DBProvider(MainActivity.this);
                     provider.open();
                     String termName = ((Term) parent.getAdapter().getItem(position)).getTermTitle();
-                    if(provider.isTermEmpty((Term)parent.getAdapter().getItem(position))) {
+                    if (provider.isTermEmpty((Term) parent.getAdapter().getItem(position))) {
 
                         provider.delete((Term) parent.getAdapter().getItem(position));
                         provider.close();
                         Toast.makeText(MainActivity.this, "Term: " + termName + " has been deleted!", Toast.LENGTH_SHORT).show();
                         displayTerms();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Cannot delete term: " + termName + ", it still has courses!", Toast.LENGTH_SHORT).show();
                     }
-                    else {
-                        Toast.makeText(MainActivity.this, "Cannot delete term: "+termName+", it still has courses!", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else {
+                } else {
                     Intent intent = new Intent(MainActivity.this, TermEditor.class);
                     Term term = (Term) parent.getAdapter().getItem(position);
                     Bundle bundle = new Bundle();
@@ -131,12 +126,6 @@ public class MainActivity extends AppCompatActivity {
         provider.close();
     }
 
-    private void insertNote(String noteText) {
-        ContentValues values = new ContentValues();
-        values.put(DBOpenHelper.TERM_TITLE, noteText);
-
-    }
-
     public void openTermEditor(View view) {
         Intent intent = new Intent(MainActivity.this, TermEditor.class);
         Bundle bundle = new Bundle();
@@ -148,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         displayTerms();
-        if(requestCode == EDITOR_REQUEST_CODE && resultCode == RESULT_OK) {
+        if (requestCode == EDITOR_REQUEST_CODE && resultCode == RESULT_OK) {
             displayTerms();
         }
     }

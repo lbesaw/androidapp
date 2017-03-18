@@ -13,188 +13,216 @@
     tools:context="com.example.mord.myapplication.CourseEditor"
     tools:showIn="@layout/activity_course_editor">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/textView6"
-        android:layout_toEndOf="@+id/textView6"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:id="@+id/courseEditorCourseName" />
-
-    <TextView
-        android:text="Course name:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView6"
-        android:layout_alignBaseline="@+id/courseEditorCourseName"
-        android:layout_alignBottom="@+id/courseEditorCourseName"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:text="Start date:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView7"
-        android:layout_alignBottom="@+id/ivStartAlarm"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:text="Click here to set date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/tvStartDate"
-        android:layout_alignBottom="@+id/ivStartAlarm"
-        android:layout_alignLeft="@+id/courseEditorCourseName"
-        android:layout_alignStart="@+id/courseEditorCourseName" />
-
-    <TextView
-        android:text="End date:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:id="@+id/textView11"
-        android:layout_below="@+id/textView7"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:text="Click here to set date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/textView11"
-        android:layout_alignLeft="@+id/tvStartDate"
-        android:layout_alignStart="@+id/tvStartDate"
-        android:id="@+id/tvEndDate" />
-
-
-    <TextView
-        android:text="Mentor e-mail:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView14"
-        android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:layout_above="@+id/textView14"
-        android:layout_alignLeft="@+id/tvEndDate"
-        android:layout_alignStart="@+id/tvEndDate"
-        android:layout_marginBottom="15dp"
-        android:id="@+id/mentorName"
-        android:text="Click here to set mentor" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:layout_centerVertical="true"
-        android:layout_alignLeft="@+id/mentorName"
-        android:layout_alignStart="@+id/mentorName"
-        android:id="@+id/mentorEmail" />
-
-    <TextView
-        android:text="Mentor name:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView13"
-        android:layout_alignBaseline="@+id/mentorName"
-        android:layout_alignBottom="@+id/mentorName"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:text="Status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView9"
-        android:layout_below="@+id/textView15"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="22dp" />
-
-    <Spinner
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/statusSpinner"
-        android:layout_alignTop="@+id/textView9"
-        android:layout_toRightOf="@+id/textView11"
-        android:layout_toEndOf="@+id/textView11" />
+        android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:id="@+id/mentorPhone"
-        android:layout_alignTop="@+id/textView15"
-        android:layout_alignLeft="@+id/mentorEmail"
-        android:layout_alignStart="@+id/mentorEmail" />
+        <LinearLayout
+            android:id="@+id/mainLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
 
-    <TextView
-        android:text="Mentor phone:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:id="@+id/textView15"
-        android:layout_below="@+id/textView14"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+            <LinearLayout
+                android:id="@+id/gridParent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
-    <Button
-        android:text="Assessments"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/assessmentsButton"
-        android:layout_below="@+id/textView11"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="27dp"
-        android:onClick="viewAssessments()"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/ivStartAlarm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srcCompat="@drawable/alarm"
-        android:layout_below="@+id/courseEditorCourseName"
-        android:layout_alignRight="@+id/mentorName"
-        android:layout_alignEnd="@+id/mentorName" />
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srcCompat="@drawable/alarm"
-        android:layout_above="@+id/assessmentsButton"
-        android:layout_alignLeft="@+id/ivStartAlarm"
-        android:layout_alignStart="@+id/ivStartAlarm" />
+                        <TextView
+                            android:id="@+id/textView6"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Course name:" />
 
-    <CheckBox
-        android:id="@+id/cbStartAlarm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/ivStartAlarm"
-        android:layout_toRightOf="@+id/ivStartAlarm"
-        android:layout_below="@+id/courseEditorCourseName" />
+                        <EditText
+                            android:id="@+id/courseEditorCourseName"
+                            android:layout_width="180dp"
+                            android:layout_height="wrap_content"
+                            android:ems="10"
+                            android:inputType="textPersonName" />
 
-    <CheckBox
-        android:id="@+id/cbEndAlarm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/assessmentsButton"
-        android:layout_alignEnd="@+id/cbStartAlarm"
-        android:layout_alignRight="@+id/cbStartAlarm"
-        android:layout_alignTop="@+id/imageView2"
-        android:layout_toRightOf="@+id/imageView2" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/textView7"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Start date:" />
+
+                        <TextView
+                            android:id="@+id/tvStartDate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Click here to set date" />
+
+                        <ImageView
+                            android:id="@+id/ivStartAlarm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@drawable/alarm" />
+
+                        <CheckBox
+                            android:id="@+id/cbStartAlarm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/textView11"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="End date:" />
+
+                        <TextView
+                            android:id="@+id/tvEndDate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Click here to set date" />
+
+                        <ImageView
+                            android:id="@+id/imageView2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@drawable/alarm" />
+
+                        <CheckBox
+                            android:id="@+id/cbEndAlarm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </TableLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_margin="20dp"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/assessmentsButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="viewAssessments()"
+                    android:text="Assessments"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/mentorContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="10dp">
+
+                        <TextView
+                            android:id="@+id/textView13"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Mentor name:" />
+
+                        <TextView
+                            android:id="@+id/mentorName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ems="10"
+                            android:text="Click here to set mentor" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="10dp">
+
+                        <TextView
+                            android:id="@+id/textView14"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Mentor e-mail:" />
+
+                        <TextView
+                            android:id="@+id/mentorEmail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ems="10" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="10dp">
+
+                        <TextView
+                            android:id="@+id/textView15"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Mentor phone:" />
+
+                        <TextView
+                            android:id="@+id/mentorPhone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ems="10" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="10dp">
+
+                        <TextView
+                            android:id="@+id/textView9"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Status" />
+
+                        <Spinner
+                            android:id="@+id/statusSpinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                    </TableRow>
+                </TableLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+
 </RelativeLayout>

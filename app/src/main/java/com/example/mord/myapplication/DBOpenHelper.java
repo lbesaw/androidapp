@@ -10,7 +10,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "helperApp.db";
     private static final int DATABASE_VERSION = 2;
 
-    //Constants for identifying 'terms' table and columns
+    //Constants for terms table
     public static final String TABLE_TERMS = "terms";
     public static final String TERM_ID = "_id";
     public static final String TERM_TITLE = "termTitle";
@@ -21,13 +21,13 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public static final String TERM_END_MONTH = "termEndMonth";
     public static final String TERM_END_YEAR = "termEndYear";
 
-    //Constants for identifying 'courses' table and columns
+    //Constants for courses table
     public static final String TABLE_COURSES = "courses";
     public static final String COURSE_ID = "_id";
     public static final String COURSE_TERM = "courseInTerm";
     public static final String COURSE_TITLE = "courseTitle";
     public static final String COURSE_STATUS = "courseStatus";
-   public static final String COURSE_MENTOR = "courseMentor";
+    public static final String COURSE_MENTOR = "courseMentor";
     public static final String COURSE_TEXT_NOTES = "courseTextNotes";
     public static final String COURSE_PICTURE_NOTES = "coursePictureNotes";
     public static final String COURSE_START_DAY = "startDay";
@@ -37,15 +37,14 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public static final String COURSE_END_MONTH = "endMonth";
     public static final String COURSE_END_YEAR = "endYear";
 
-    //Constants for identifying 'assessments' table and columns
 
-    //Constants for making 'mentor' table
+    //Constants for mentors table
     public static final String TABLE_MENTORS = "mentors";
     public static final String MENTOR_NAME = "mentorName";
     public static final String MENTOR_PHONE = "mentorPhone";
     public static final String MENTOR_EMAIL = "mentorEmail";
 
-
+    //Constants for assessments table
     public static final String TABLE_ASSESSMENTS = "assessments";
     public static final String ASSESSMENT_ID = "_id";
     public static final String ASSESSMENT_COURSE = "assessmentInCourse";
@@ -55,13 +54,14 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public static final String ASSESSMENT_DUE_DAY = "startDay";
     public static final String ASSESSMENT_DUE_MONTH = "startMonth";
     public static final String ASSESSMENT_DUE_YEAR = "startYear";
+    public static final String ASSESSMENT_NAME = "assName";
 
 
-
-    //SQL for creating assessments table
+    //Statment to create assessments table
     public static final String ASSESSMENTS_TABLE_CREATE =
             "CREATE TABLE " + TABLE_ASSESSMENTS + " (" +
                     ASSESSMENT_ID + " TEXT, " +
+                    ASSESSMENT_NAME + " TEXT, "+
                     ASSESSMENT_COURSE + " TEXT, " +
                     ASSESSMENT_TYPE + " TEXT, " +
                     ASSESSMENT_TEXT_NOTES + " TEXT, " +
@@ -69,12 +69,13 @@ public class DBOpenHelper extends SQLiteOpenHelper {
                     ASSESSMENT_DUE_DAY + " INTEGER, " +
                     ASSESSMENT_DUE_MONTH + " INTEGER, " +
                     ASSESSMENT_DUE_YEAR + " INTEGER, " +
+
                     "FOREIGN KEY ("+ASSESSMENT_COURSE+") REFERENCES "+
                     TABLE_COURSES+"("+COURSE_TITLE+") "+
                     ")";
 
 
-    //SQL for creating courses table
+    //Statement to create courses table
     private static final String COURSES_TABLE_CREATE =
             "CREATE TABLE " + TABLE_COURSES + " (" +
                     COURSE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -95,7 +96,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
                     "FOREIGN KEY ("+COURSE_TERM+") REFERENCES "+
                     TABLE_TERMS+"("+TERM_TITLE+") "+
                     ")";
-
+    //statement to create mentors table
     public static final String MENTORS_TABLE_CREATE =
             "CREATE TABLE "+TABLE_MENTORS+" ("+
                     MENTOR_NAME + " TEXT PRIMARY KEY, " +
@@ -104,7 +105,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
                     ")";
 
 
-    //SQL to create term table
+    //Statement to create terms table
     private static final String TERMS_TABLE_CREATE =
             "CREATE TABLE " + TABLE_TERMS + " (" +
                     TERM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +

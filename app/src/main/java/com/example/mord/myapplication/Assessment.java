@@ -1,7 +1,7 @@
 package com.example.mord.myapplication;
 
 /**
- * Created by narhwal on 3/7/2017.
+ * Assessment object containing all of the required fields to interface with the database
  */
 
 public class Assessment {
@@ -9,33 +9,43 @@ public class Assessment {
     private String note;
     private String course;
     private String id;
+    private String name;
     private int day, month, year;
 
-    public void setDate(int day, int month, int year){
-        this.day = day;
-        this.year = year;
-        this.month = month;
-    }
     public String getId() {
         return id;
-            }
-            public void setId(String id) {
-                this.id = id;
-            }
-    public String getDateAsString() {
-        return month+"/"+day+"/"+year;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getDateAsString() {
+        return month + "/" + day + "/" + year;
+    }
+
     public String getType() {
         return type;
     }
-    public int getTypeNo() { if(this.type.equals("Objective assessment"))
-    return 1;
-    if(this.type.equals("Performance assessment"))
-    return 0;
-        else return -1;
-    }
+
     public void setType(String type) {
         this.type = type;
+    }
+
+    public int getTypeNo() {
+        if (this.type.equals("Objective assessment"))
+            return 1;
+        if (this.type.equals("Performance assessment"))
+            return 0;
+        else return -1;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getNote() {
@@ -77,12 +87,14 @@ public class Assessment {
     public void setYear(int year) {
         this.year = year;
     }
+
     public void setDueDate(int day, int month, int year) {
         this.day = day;
         this.month = month;
         this.year = year;
     }
+
     public String toString() {
-        return type.split(" ")[0]+" | Due: "+getDateAsString();
+        return name + " | " + type.charAt(0) + " | " + getDateAsString();
     }
 }

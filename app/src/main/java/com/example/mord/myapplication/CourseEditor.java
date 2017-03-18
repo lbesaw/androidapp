@@ -40,7 +40,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 public class CourseEditor extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-private Term thisTerm;
+    private Term thisTerm;
     private static final int EDITOR_REQUEST_CODE = 6661;
     private Course thisCourse = new Course();
     private DBProvider provider;
@@ -73,11 +73,15 @@ private Term thisTerm;
         final CheckBox cbStartAlarm = (CheckBox) findViewById(R.id.cbStartAlarm);
         final CheckBox cbEndAlarm = (CheckBox) findViewById(R.id.cbEndAlarm);
         final Button assessmentsButton = (Button) findViewById(R.id.assessmentsButton);
+
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.status_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
         thisCourse.setTermTitle(termTitle);
+
+        //setting up the layout, if it's an edited term, we have to populate all of the fields
+        //from the database
         if (id == null)
             action = Intent.ACTION_INSERT;
         else {
@@ -85,33 +89,29 @@ private Term thisTerm;
             provider.open();
             action = Intent.ACTION_EDIT;
             thisCourse = provider.getCourse(id);
-            boolean hasStartAlarm = prefs.getBoolean(thisCourse.getCourseTitle()+"startAlarm", false);
-            boolean hasEndAlarm = prefs.getBoolean(thisCourse.getCourseTitle()+"endAlarm", false);
+            boolean hasStartAlarm = prefs.getBoolean(thisCourse.getCourseTitle() + "startAlarm", false);
+            boolean hasEndAlarm = prefs.getBoolean(thisCourse.getCourseTitle() + "endAlarm", false);
             Mentor mentor;
-            if(hasStartAlarm) {
+            if (hasStartAlarm) {
                 cbStartAlarm.setEnabled(false);
                 cbStartAlarm.setChecked(true);
             }
-            if(hasEndAlarm) {
+            if (hasEndAlarm) {
                 cbEndAlarm.setEnabled(false);
                 cbEndAlarm.setChecked(true);
             }
-            if(thisCourse.getCourseStatus()!=null) {
-                if(thisCourse.getCourseStatus().equals("In progress")) {
+            if (thisCourse.getCourseStatus() != null) {
+                if (thisCourse.getCourseStatus().equals("In progress")) {
                     spinner.setSelection(0);
-                    Toast.makeText(this, thisCourse.getCourseStatus(), Toast.LENGTH_LONG).show();
                 }
-                if(thisCourse.getCourseStatus().equals("Completed")) {
+                if (thisCourse.getCourseStatus().equals("Completed")) {
                     spinner.setSelection(1);
-                    Toast.makeText(this, thisCourse.getCourseStatus(), Toast.LENGTH_LONG).show();
                 }
-                if(thisCourse.getCourseStatus().equals("Dropped")) {
+                if (thisCourse.getCourseStatus().equals("Dropped")) {
                     spinner.setSelection(2);
-                    Toast.makeText(this, thisCourse.getCourseStatus(), Toast.LENGTH_LONG).show();
                 }
-                if(thisCourse.getCourseStatus().equals("Planned")) {
+                if (thisCourse.getCourseStatus().equals("Planned")) {
                     spinner.setSelection(3);
-                    Toast.makeText(this, thisCourse.getCourseStatus(), Toast.LENGTH_LONG).show();
                 }
             }
             if (thisCourse.getCourseMentor() != null) {
@@ -125,6 +125,8 @@ private Term thisTerm;
             tvEndDate.setText(thisCourse.getEndMonth() + "/" + thisCourse.getEndDay() + "/" + thisCourse.getEndYear());
         }
         thisTerm = provider.getTerm(termTitle);
+        provider.close();
+        //setting up FAB to add notes to the course
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,7 +136,6 @@ private Term thisTerm;
                 Bundle bundle = new Bundle();
                 bundle.putString("termTitle", thisTerm.getTermTitle());
                 bundle.putString("courseTitle", thisCourse.getCourseTitle());
-
                 intent.putExtras(bundle);
                 startActivityForResult(intent, EDITOR_REQUEST_CODE);
             }
@@ -148,7 +149,8 @@ private Term thisTerm;
             }
         });
 
-
+        //here using an android design element to allow the user to choose a date from a calendar
+        //view instead of having to type in a date
         tvStartDate.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -164,7 +166,6 @@ private Term thisTerm;
                 };
                 Calendar cal = Calendar.getInstance(TimeZone.getDefault()); // Get current date
 
-// Create the DatePickerDialog instance
                 DatePickerDialog datePicker = new DatePickerDialog(CourseEditor.this,
                         R.style.AppTheme, datePickerListener,
                         cal.get(Calendar.YEAR),
@@ -191,8 +192,6 @@ private Term thisTerm;
                     }
                 };
                 Calendar cal = Calendar.getInstance(TimeZone.getDefault()); // Get current date
-
-// Create the DatePickerDialog instance
                 DatePickerDialog datePicker = new DatePickerDialog(CourseEditor.this,
                         R.style.AppTheme, datePickerListener,
                         cal.get(Calendar.YEAR),
@@ -204,18 +203,19 @@ private Term thisTerm;
 
             }
         });
-
+        //button to launch assessments activity
         assessmentsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                finishedEditing();
+                final EditText courseName = (EditText) findViewById(R.id.courseEditorCourseName);
                 Intent intent = new Intent(CourseEditor.this, AssessmentList.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("termTitle", termTitle);
-                bundle.putString("courseTitle", thisCourse.getCourseTitle());
+                bundle.putString("courseTitle", courseName.getText().toString().trim());
                 intent.putExtras(bundle);
                 startActivity(intent);
-                finishedEditing();
+
             }
         });
         tvMentorName.setOnClickListener(new View.OnClickListener() {
@@ -224,25 +224,23 @@ private Term thisTerm;
                 addMentor();
             }
         });
-
-       // ImageView cbStartAlarm = (ImageView) findViewById(R.id.ivStartAlarm);
+        //Here I set up code to notify users at 10am on the day they are scheduled to start and end
+        //a course
         cbStartAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!tvStartDate.getText().toString().equals("0/0/0") && !tvStartDate.getText().toString().equals("Click here to set date") && cbStartAlarm.isEnabled()) {
-                try {
+                    try {
                         SetAlarm(tvStartDate.getText().toString(), courseName.getText().toString(), "start");
                         Toast.makeText(CourseEditor.this, "Notification scheduled for " + courseName.getText().toString(), Toast.LENGTH_SHORT).show();
                         cbStartAlarm.setEnabled(false);
-                        editor.putBoolean(courseName.getText().toString()+"startAlarm", true);
-                    editor.commit();
-                    }
-                catch(Exception e){
+                        editor.putBoolean(courseName.getText().toString() + "startAlarm", true);
+                        editor.commit();
+                    } catch (Exception e) {
                         System.out.println("FAIL");
                         e.printStackTrace();
                     }
-                }
-                else if(tvStartDate.getText().toString().equals("0/0/0") || tvStartDate.getText().toString().equals("Click here to set date")) {
+                } else if (tvStartDate.getText().toString().equals("0/0/0") || tvStartDate.getText().toString().equals("Click here to set date")) {
                     Toast.makeText(CourseEditor.this, "You must choose a valid date before setting an alarm", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -255,15 +253,13 @@ private Term thisTerm;
                         SetAlarm(tvEndDate.getText().toString(), courseName.getText().toString(), "end");
                         Toast.makeText(CourseEditor.this, "Notification scheduled for " + courseName.getText().toString(), Toast.LENGTH_SHORT).show();
                         cbEndAlarm.setEnabled(false);
-                        editor.putBoolean(courseName.getText().toString()+"endAlarm", true);
+                        editor.putBoolean(courseName.getText().toString() + "endAlarm", true);
                         editor.commit();
-                    }
-                    catch(Exception e){
+                    } catch (Exception e) {
                         System.out.println("FAIL");
                         e.printStackTrace();
                     }
-                }
-                else if(tvEndDate.getText().toString().equals("0/0/0") || tvEndDate.getText().toString().equals("Click here to set date")) {
+                } else if (tvEndDate.getText().toString().equals("0/0/0") || tvEndDate.getText().toString().equals("Click here to set date")) {
                     Toast.makeText(CourseEditor.this, "You must choose a valid date before setting an alarm", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -271,30 +267,28 @@ private Term thisTerm;
 
     }
 
-    public void SetAlarm(String date, final String courseName, final String startOrEnd) throws Exception
-    {
+    public void SetAlarm(String date, final String courseName, final String startOrEnd) throws Exception {
         BroadcastReceiver receiver = new BroadcastReceiver() {
-            @Override public void onReceive(Context context, Intent intent )
-            {
+            @Override
+            public void onReceive(Context context, Intent intent) {
 
-                NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(5, getNotification("Course: "+courseName+" is scheduled to "+startOrEnd+" today!"));
+                NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(5, getNotification("Course: " + courseName + " is scheduled to " + startOrEnd + " today!"));
 
-                context.unregisterReceiver( this );
+                context.unregisterReceiver(this);
             }
         };
 
-        this.registerReceiver( receiver, new IntentFilter("com.example.mord.myapplication") );
+        this.registerReceiver(receiver, new IntentFilter("com.example.mord.myapplication"));
 
-        PendingIntent pintent = PendingIntent.getBroadcast( this, 0, new Intent("com.example.mord.myapplication"), 0 );
-        AlarmManager manager = (AlarmManager)(this.getSystemService( Context.ALARM_SERVICE ));
-        date = date+" 10:00:00 PST";
+        PendingIntent pintent = PendingIntent.getBroadcast(this, 0, new Intent("com.example.mord.myapplication"), 0);
+        AlarmManager manager = (AlarmManager) (this.getSystemService(Context.ALARM_SERVICE));
+        date = date + " 10:00:00 PST";
         SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss zzz");
         Date tempDate = df.parse(date);
         long epoch = tempDate.getTime();
 
-        System.out.println("DEBUG>>> EPOCH LENGTH BETWEEN NOW AND DATE " +(epoch-System.currentTimeMillis()));
-        manager.set( AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+(epoch - System.currentTimeMillis()), pintent);
+        manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + (epoch - System.currentTimeMillis()), pintent);
     }
 
     private Notification getNotification(String content) {
@@ -304,23 +298,22 @@ private Term thisTerm;
         builder.setSmallIcon(R.drawable.ic_launcher);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             return builder.build();
-        }
-        else return null;
+        } else return null;
     }
 
-        @Override
-        public void onItemSelected (AdapterView < ? > adapterView, View view,int i, long l){
-            status = adapterView.getItemAtPosition(i).toString();
-            thisCourse.setCourseStatus(status);
-            //Toast.makeText(this, thisCourse.getCourseStatus(), Toast.LENGTH_LONG).show();
-        }
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        status = adapterView.getItemAtPosition(i).toString();
+        thisCourse.setCourseStatus(status);
+    }
 
-        @Override
-        public void onNothingSelected (AdapterView < ? > adapterView){
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
 
-        }
+    }
 
-    public void addMentor(){
+    //code to add a mentor to the database
+    public void addMentor() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.temporary_layout, null);
@@ -332,10 +325,10 @@ private Term thisTerm;
         final TextView tvMentorphone = (TextView) findViewById(R.id.mentorPhone);
         builder.setView(dialogView);
         builder.setTitle("Add mentor");
-        if(!tvMentorname.getText().toString().equals("Click here to set mentor"))
-                mentorName.setText(tvMentorname.getText().toString());
-                mentorEmail.setText(tvMentoremail.getText().toString());
-                mentorPhone.setText(tvMentorphone.getText().toString());
+        if (!tvMentorname.getText().toString().equals("Click here to set mentor"))
+            mentorName.setText(tvMentorname.getText().toString());
+        mentorEmail.setText(tvMentoremail.getText().toString());
+        mentorPhone.setText(tvMentorphone.getText().toString());
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -371,17 +364,16 @@ private Term thisTerm;
     private void finishedEditing() {
         final EditText courseName = (EditText) findViewById(R.id.courseEditorCourseName);
         thisCourse.setTermTitle(thisTerm.getTermTitle());
-        switch(action) {
+        switch (action) {
             case Intent.ACTION_INSERT:
-                if(courseName.getText().toString() != null && !courseName.getText().toString().trim().equals(""))
-                insertCourse(courseName.getText().toString().trim());
+                if (courseName.getText().toString() != null && !courseName.getText().toString().trim().equals(""))
+                    insertCourse(courseName.getText().toString().trim());
                 break;
             case Intent.ACTION_EDIT:
                 DBProvider provider = new DBProvider(this);
                 provider.open();
-                course=thisCourse.getCourseTitle();
+                course = thisCourse.getCourseTitle();
                 thisCourse.setCourseTitle(courseName.getText().toString());
-                Toast.makeText(this, thisCourse.getCourseMentor(), Toast.LENGTH_LONG).show();
                 provider.update(course, thisCourse);
                 setResult(RESULT_OK);
                 provider.close();
@@ -402,14 +394,15 @@ private Term thisTerm;
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(Integer.parseInt(android.os.Build.VERSION.SDK) > 5
-            && keyCode == KeyEvent.KEYCODE_BACK
-            && event.getRepeatCount() == 0) {
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
             onBackPressed();
             return true;
         }
         return super.onKeyDown(keyCode, event);
     }
+
     @Override
     public void onBackPressed() {
         finishedEditing();
@@ -421,11 +414,12 @@ private Term thisTerm;
         startActivityForResult(intent, EDITOR_REQUEST_CODE);
 
     }
+
     private void deleteWarn() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setTitle("Delete note?");
-        builder.setMessage("Are you sure you want to delete this note?");
+        builder.setTitle("Delete course?");
+        builder.setMessage("Are you sure you want to delete this course?");
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 CourseEditor.this.deleteIt();
@@ -454,6 +448,7 @@ private Term thisTerm;
         intent.putExtras(bundle);
         startActivity(intent);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -467,6 +462,7 @@ private Term thisTerm;
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();

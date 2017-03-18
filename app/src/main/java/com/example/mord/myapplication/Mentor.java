@@ -1,7 +1,7 @@
 package com.example.mord.myapplication;
 
 /**
- * Created by narhwal on 1/31/2017.
+ * Mentor object with simple getters and setters
  */
 public class Mentor {
     private String name;

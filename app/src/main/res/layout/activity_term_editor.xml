@@ -33,42 +33,122 @@
         tools:context="com.example.mord.myapplication.TermEditor"
         tools:showIn="@layout/activity_term_editor">
 
-        <TextView
-            android:text="Start Date:"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/LayoutTop"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/termInputName"
-            android:layout_toLeftOf="@+id/termInputName"
-            android:layout_toStartOf="@+id/termInputName"
-            android:layout_marginTop="44dp"
-            android:id="@+id/textView4" />
+            android:orientation="vertical">
 
-        <TextView
-            android:text="End Date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/startDateEditText"
-            android:layout_alignLeft="@+id/textView4"
-            android:layout_alignStart="@+id/textView4"
-            android:layout_marginTop="25dp"
-            android:id="@+id/textView5" />
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="5">
 
-        <ListView
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp">
+
+                    <TextView
+                        android:id="@+id/textView2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_weight="0.12"
+                        android:text="Term Title: " />
+
+                    <EditText
+                        android:id="@+id/termInputName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_toEndOf="@+id/textView2"
+                        android:layout_toRightOf="@+id/textView2"
+                        android:layout_weight="0.12"
+                        android:ems="10"
+                        android:inputType="textPersonName" />
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp">
+
+                    <TextView
+                        android:id="@+id/textView4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_above="@+id/layoutList"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_weight="1"
+                        android:text="Start Date:" />
+
+                    <TextView
+                        android:id="@+id/startDateEditText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:text="Click to choose date" />
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp">
+
+                    <TextView
+                        android:id="@+id/textView5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="End Date:" />
+
+                    <TextView
+                        android:id="@+id/endDateEditText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:text="Click to choose date" />
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp">
+
+                    <TextView
+                        android:id="@+id/textView3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Courses:" />
+                </TableRow>
+            </TableLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/submitButton"
-            android:id="@+id/courseList"/>
+            android:orientation="horizontal"
+            android:layout_below="@+id/LayoutTop">
 
-        <Button
-            android:text="Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/submitButton"
-            android:layout_below="@+id/textView5"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+            <ListView
+                android:id="@+id/courseList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+        </LinearLayout>
 
         <at.markushi.ui.CircleButton
             android:layout_width="64dp"
@@ -82,60 +162,6 @@
             app:cb_pressedRingWidth="8dp"
              />
 
-        <TextView
-            android:text="Courses"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView3"
-            android:layout_alignBaseline="@+id/submitButton"
-            android:layout_alignBottom="@+id/submitButton"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Click to choose date"
-            android:ems="10"
-            android:id="@+id/startDateEditText"
-            android:layout_alignBaseline="@+id/textView4"
-            android:layout_alignBottom="@+id/textView4"
-            android:layout_alignLeft="@+id/termInputName"
-            android:layout_alignStart="@+id/termInputName" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:text="Click to choose end date"
-            android:id="@+id/endDateEditText"
-            android:layout_above="@+id/submitButton"
-            android:layout_alignLeft="@+id/startDateEditText"
-            android:layout_alignStart="@+id/startDateEditText" />
-
-        <EditText
-            android:id="@+id/termInputName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_toEndOf="@+id/textView2"
-            android:layout_toRightOf="@+id/textView2"
-            android:layout_weight="0.12"
-            android:ems="10"
-            android:inputType="textPersonName" />
-
-        <TextView
-            android:text="Term Title: "
-            android:layout_width="wrap_content"
-            android:id="@+id/textView2"
-            android:layout_weight="0.12"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/termInputName"
-            android:layout_alignBottom="@+id/termInputName"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
     </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

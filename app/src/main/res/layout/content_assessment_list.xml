@@ -8,7 +8,8 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.mord.myapplication.AssessmentList"
     tools:showIn="@layout/activity_assessment_list">
-<LinearLayout
+
+    <LinearLayout
     android:orientation="horizontal"
     android:layout_width="30dp"
     android:layout_height="60dp"
@@ -29,7 +30,7 @@
         android:text="TextView"
         android:textAlignment="center"/>
 
-    <TextView
+        <TextView
         android:id="@+id/tvTerm1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

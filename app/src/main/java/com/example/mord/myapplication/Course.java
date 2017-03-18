@@ -6,7 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by narhwal on 1/31/2017.
+ * Course class, containing all of the members and getters/setters necessary for use with the
+ * database
  */
 
 public class Course implements Serializable {
@@ -16,36 +17,36 @@ public class Course implements Serializable {
     private String courseMentor;
     private int startDay, startMonth, startYear;
     private int endDay, endMonth, endYear;
-    private List<String> courseAssessments = new ArrayList<>();
-    private List<String> courseTextNotes;
     private String notes;
-    public Course(String courseTitle, String courseStatus, Mentor courseMentor,
-                  String[] courseAssessments, String[] courseTextNotes, int startDay,
+
+    public Course(String courseTitle, String courseStatus, int startDay,
                   int startMonth, int startYear, int endDay, int endMonth, int endYear) {
         this.courseTitle = courseTitle;
         this.courseStatus = courseStatus;
-        this.courseAssessments = Arrays.asList(courseAssessments);
-        this.courseTextNotes = Arrays.asList(courseTextNotes);
-        this.startDay=startDay;
-        this.startMonth=startMonth;
+        this.startDay = startDay;
+        this.startMonth = startMonth;
         this.startYear = startYear;
         this.endDay = endDay;
         this.endMonth = endMonth;
         this.endYear = endYear;
     }
+
     public Course() {
         super();
     }
-public void setStartDate(int startDay, int startMonth, int startYear) {
-    this.startDay = startDay;
-    this.startMonth = startMonth;
-    this.startYear = startYear;
-}
+
+    public void setStartDate(int startDay, int startMonth, int startYear) {
+        this.startDay = startDay;
+        this.startMonth = startMonth;
+        this.startYear = startYear;
+    }
+
     public void setEndDate(int endDay, int endMonth, int endYear) {
         this.endDay = endDay;
         this.endMonth = endMonth;
         this.endYear = endYear;
     }
+
     public String getTermTitle() {
         return termTitle;
     }
@@ -53,15 +54,7 @@ public void setStartDate(int startDay, int startMonth, int startYear) {
     public void setTermTitle(String termTitle) {
         this.termTitle = termTitle;
     }
-    public void addAssessment(String assessment) {
-        courseAssessments.add(assessment);
-    }
-    public List<String> getCourseAssessments() {
-        return courseAssessments;
-    }
-    public void addNote(String note) {
-        courseTextNotes.add(note);
-    }
+
     public String getCourseTitle() {
         return courseTitle;
     }
@@ -125,21 +118,24 @@ public void setStartDate(int startDay, int startMonth, int startYear) {
     public void setEndYear(int endYear) {
         this.endYear = endYear;
     }
-    public void setCourseMentor(String mentor) {
-        this.courseMentor = mentor;
-    }
+
     public String getCourseMentor() {
         return courseMentor;
+    }
+
+    public void setCourseMentor(String mentor) {
+        this.courseMentor = mentor;
     }
 
     public String getNotes() {
         return notes;
     }
+
     public void setNotes(String notes) {
         this.notes = notes;
     }
 
     public String toString() {
-        return courseTitle + " - "+ startMonth+"/"+startDay+"/"+startYear;
+        return courseTitle + " - " + startMonth + "/" + startDay + "/" + startYear;
     }
 }
